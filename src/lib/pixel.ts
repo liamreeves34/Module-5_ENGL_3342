@@ -100,16 +100,26 @@ export function spine(book: Cloth) {
   return svg(g, "px spine-art");
 }
 
+/** The fore-edge of a hardcover seen from slightly right of face-on: the text block (two
+ *  cells, shaded where it tucks under the front board) rests on the back board, which overhangs
+ *  it by one cell at the head and tail and shows its own edge behind. Three cells wide. */
+function foreEdge(g: Grid, x: number, H: number, c: string) {
+  rect(g, x, 0, 2, H, shade(c, -0.2));                  // back board's squares above and below
+  rect(g, x, 1, 2, H - 2, T.pages);                     // text block, inset at head and tail
+  rect(g, x, 1, 1, H - 2, shade(T.pages, -0.12));       // in the front board's shadow
+  for (let y = 2; y < H - 1; y += 2) g[y][x + 1] = shade(T.pages, -0.1);   // leaves
+  rect(g, x + 2, 0, 1, H, shade(c, -0.4));              // back board's edge
+}
+
 export function cover(book: Cloth) {
-  const W = T.coverW, H = book.H ?? T.spineH, P = 2;
-  const g = grid(W + P, H), c = book.cloth;
+  const W = T.coverW, H = book.H ?? T.spineH;
+  const g = grid(W + 3, H), c = book.cloth;
   rect(g, 0, 0, W, H, c);
   rect(g, 0, 0, 2, H, shade(c, -0.25));
   rect(g, 2, 0, 1, H, shade(c, 0.18));
   rect(g, W - 1, 0, 1, H, shade(c, -0.3));
   rect(g, 0, H - 1, W, 1, shade(c, -0.3));
-  rect(g, W, 1, P, H - 1, T.pages);
-  for (let y = 2; y < H; y += 2) g[y][W + 1] = shade(T.pages, -0.12);
+  foreEdge(g, W, H, c);
   for (let y = 7; y < H - 2; y++) for (let x = 3; x < W - 1; x++) if ((x * 7 + y * 3) % 11 === 0) g[y][x] = shade(c, 0.08);
   const panelW = 20, panelX = Math.floor((W - panelW) / 2) + 1, panelY = H - 25;
   rect(g, panelX, panelY, panelW, 20, book.panel);
@@ -148,17 +158,16 @@ export function spreadHalf(board: string, H: number, side: "left" | "right") {
 }
 
 /** The front cover at open-book size (67 cells by H + 2 rows): the shelf cover's design,
- *  with its page block on the right and the icon panel at double size. */
+ *  with its hardcover fore-edge on the right and the icon panel at double size. */
 export function bigCover(book: Cloth, Hc: number) {
-  const Wc = 67, P = 2, W = Wc - P;
+  const Wc = 67, W = Wc - 3;
   const g = grid(Wc, Hc), c = book.cloth;
   rect(g, 0, 0, W, Hc, c);
   rect(g, 0, 0, 2, Hc, shade(c, -0.25));
   rect(g, 2, 0, 1, Hc, shade(c, 0.18));
   rect(g, W - 1, 0, 1, Hc, shade(c, -0.3));
   rect(g, 0, Hc - 1, W, 1, shade(c, -0.3));
-  rect(g, W, 1, P, Hc - 1, T.pages);
-  for (let y = 2; y < Hc; y += 2) g[y][W + 1] = shade(T.pages, -0.12);
+  foreEdge(g, W, Hc, c);
   for (let y = 7; y < Hc - 2; y++) for (let x = 3; x < W - 1; x++) if ((x * 7 + y * 3) % 11 === 0) g[y][x] = shade(c, 0.08);
   const panel = 36, px = Math.floor((W - panel) / 2) + 1, py = Hc - panel - 8;
   rect(g, px, py, panel, panel, book.panel);

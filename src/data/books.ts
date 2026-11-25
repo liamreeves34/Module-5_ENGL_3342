@@ -103,7 +103,7 @@ export const modules: ModuleBook[] = [
     title: "Redesigning UTRGV Parking Availability",
     runningHead: "Module 3 · Recommendation report", where: "5 entries · Oct–Nov 2026 · with Gaby Saboia",
     cloth: "#F0B429", band: "#1F2A44", panel: "#FFF4D6", iconA: "#1F2A44", iconB: "#2449A6", text: "#1F2A1D", icon: "park", kick: "#7A5300",
-    foot: ["Credits", "Co-written with Gaby Saboia. Peer review by Joanna Gutierrez, published with her permission."],
+    foot: ["Credits", "Co-written with Gaby Saboia. Peer review by Joanna Gutierrez."],
     reflection: paras(m3r),
     spreadH: 84,
     docs: [
@@ -125,7 +125,7 @@ export const modules: ModuleBook[] = [
       doc("peer-review", {
         title: "Peer Review", sub: "By Joanna Gutierrez", pages: 4,
         summary: [
-          "Joanna Gutierrez’s section-by-section review of our draft, scored on a five-point scale with strengths and areas for improvement. Published with her permission.",
+          "Joanna Gutierrez’s section-by-section review of our draft, scored on a five-point scale with strengths and areas for improvement.",
         ],
         facts: [["Pages", "4"], ["Reviewed", "Oct 27, 2026"], ["Reviewer", "Joanna Gutierrez"]],
       }, "m3-peer-review"),
