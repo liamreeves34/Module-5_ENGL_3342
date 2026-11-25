@@ -131,7 +131,7 @@ function spreadSpot(art: Art) {
 function shelfPose(f: Fly, book: HTMLElement) {
   const s0 = f.art.faceH / f.H;
   const face = book.querySelector<HTMLElement>(".face")!;
-  if (getComputedStyle(face).display !== "none") {
+  if (book.matches(":hover, :focus-visible") && getComputedStyle(face).visibility !== "hidden") {
     const r = face.getBoundingClientRect();
     const deg = (Math.acos(Math.min(1, r.width / (W * s0))) * 180) / Math.PI;
     return { x: r.left, y: r.top, s: s0, deg };

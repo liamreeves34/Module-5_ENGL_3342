@@ -85,9 +85,11 @@ main:focus { outline: none; }
 .row { display: flex; align-items: flex-end; justify-content: center; gap: var(--cell); position: relative; z-index: 1; padding-top: 40px; }
 .book { position: relative; display: block; text-decoration: none; color: var(--ink-on); filter: drop-shadow(6px 10px 8px var(--shadow)); }
 .book:focus-visible { outline-offset: 4px; }
-/* The spine is the book's place on the shelf and its hit area. The face-out cover floats over
-   the shelf (centred on the spine, lifted two cells) without taking any space, so hovering never
-   moves the other books; pointer events pass through it to whatever spine is underneath. */
+/* The spine is the book's place on the shelf and its hit area; nothing about hovering changes
+   the layout, so the other books never move. On hover the spine slides up out of the shelf while
+   the face-out cover swings round to face the reader (the same motion that starts the opening
+   animation); leaving reverses it. The cover floats over the shelf, centred on its spine, and
+   pointer events pass through it to whatever spine is underneath. */
 .book .spine { position: relative; display: block; }
 .book .face { display: none; position: absolute; left: 50%; bottom: 0; transform: translate(-50%, -16px); z-index: 1; pointer-events: none; }
 .spine-title { position: absolute; left: 0; right: 0; top: calc(var(--cell) * 7.5); bottom: 96px; writing-mode: vertical-rl; display: flex; align-items: center; justify-content: center; font-family: var(--display); font-weight: 700; font-size: 20px; line-height: 1.05; text-align: center; padding: 0 8px; }
@@ -96,18 +98,28 @@ main:focus { outline: none; }
 .cover-code { font-size: 14px; line-height: 1.2; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
 .cover-name { font-family: var(--display); font-weight: 700; font-size: 25px; line-height: 1.05; letter-spacing: -0.005em; text-wrap: balance; }
 .cover-by { position: absolute; left: 28px; bottom: calc(var(--cell) * 2); font-size: 14px; line-height: 1; font-weight: 700; letter-spacing: .02em; }
-.dim { position: absolute; left: 0; right: 24px; top: -30px; display: flex; align-items: center; gap: 8px; color: var(--pencil); font-family: var(--display); font-weight: 700; font-size: 14px; letter-spacing: .08em; text-transform: uppercase; white-space: nowrap; }
-.dim i { flex: 1; height: 2px; background: var(--pencil); position: relative; }
-.dim i:first-child::before, .dim i:last-child::after { content: ""; position: absolute; top: -6px; width: 2px; height: 14px; background: var(--pencil); }
-.dim i:first-child::before { left: 0; } .dim i:last-child::after { right: 0; }
-/* Pulled out face-out: a sprite swap (grid law), lifted two cells in whole-cell steps. */
-.book:hover, .book:focus-visible { z-index: 3; }
 .book:focus-visible { outline: none; }
-.book:focus-visible .spine { opacity: 0; }
 .book:focus-visible .face { display: block; outline: 3px solid var(--pencil); outline-offset: 4px; }
+.book:focus-visible .spine { opacity: 0; }
 @media (hover: hover) {
-  .book:hover .spine { opacity: 0; }
-  .book:hover .face { display: block; }
+  .book { transition: z-index 0s 240ms; }
+  .book:hover, .book:focus-visible { z-index: 3; transition: none; }
+  .book .spine { transition: transform 240ms cubic-bezier(.2, .8, .2, 1), opacity 150ms ease-out; }
+  .book .face {
+    display: block; visibility: hidden; opacity: 0;
+    transform-origin: 50% 100%;
+    transform: translate(-50%, 0) perspective(1200px) rotateY(72deg);
+    transition: transform 240ms cubic-bezier(.2, .8, .2, 1), opacity 100ms ease-out 140ms, visibility 0s 240ms;
+  }
+  .book:hover .spine, .book:focus-visible .spine { opacity: 0; transform: translateY(-16px); }
+  .book:hover .face, .book:focus-visible .face {
+    visibility: visible; opacity: 1;
+    transform: translate(-50%, -16px) perspective(1200px) rotateY(0deg);
+    transition: transform 240ms cubic-bezier(.2, .8, .2, 1), opacity 90ms ease-out, visibility 0s;
+  }
+}
+@media (hover: hover) and (prefers-reduced-motion: reduce) {
+  .book, .book .spine, .book .face { transition: none; }
 }
 .ledge { height: 24px; margin-top: -2px; background-repeat: repeat-x; background-size: 40px 24px; image-rendering: pixelated; }
 .hint { padding: 14px 0 0; text-align: center; font-size: 16px; color: var(--ink-2); }

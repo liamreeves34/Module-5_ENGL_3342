@@ -33,6 +33,5 @@ const label = book.kind === "module" ? `${book.code}: ${book.title}` : book.titl
     <Fragment set:html={cover(book)} />
     <span class="cover-title"><span class="cover-code">{book.code}</span><span class="cover-name">{book.short}</span></span>
     <span class="cover-by">Liam Reeves</span>
-    <span class="dim" aria-hidden="true"><i></i><b>{entries}</b><i></i></span>
   </span>
 </a>
