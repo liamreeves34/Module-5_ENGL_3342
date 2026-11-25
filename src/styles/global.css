@@ -204,7 +204,6 @@ main:focus { outline: none; }
 
 /* ---------- footer ---------- */
 .foot-note { border-top: 2px solid var(--rule); background: var(--ground); padding: 20px 48px 28px; font-size: 14px; color: var(--ink-2); line-height: 1.5; }
-.foot-note p + p { margin-top: 4px; }
 
 /* ---------- page turn and book open (view transitions) ---------- */
 /* Choosing another contents line turns the right page: a six-frame stepped flip from the
