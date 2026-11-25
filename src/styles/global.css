@@ -220,6 +220,11 @@ main:focus { outline: none; }
 @media (prefers-reduced-motion: reduce) {
   :root::view-transition-old(*.turn) { animation: vt-fade-out 120ms linear both !important; transform: none; }
   :root::view-transition-new(*.turn) { animation: vt-fade-in 120ms linear both !important; transform: none; }
+  /* Every other page change (including opening a book) is a short crossfade, not a hard cut. */
+  :root::view-transition-old(root) { animation: vt-fade-out 180ms linear both !important; }
+  :root::view-transition-new(root) { animation: vt-fade-in 180ms linear both !important; }
+  :root::view-transition-old(*.book) { animation: vt-fade-out 180ms linear both !important; }
+  :root::view-transition-new(*.book) { animation: vt-fade-in 180ms linear both !important; }
 }
 
 /* Opening a book from the shelf (see the script in index.astro). The flying book is a copy of
@@ -233,7 +238,7 @@ main:focus { outline: none; }
 .fly-back { transform: rotateY(180deg); border-right-width: 6px; box-shadow: inset -12px 0 0 #E4E0D0; }
 /* Arriving from the shelf: the spread grows out of the open book, then the reflection page
    (which has no counterpart on the shelf) fades in once the book has landed. */
-.spread { view-transition-class: book; }
+.spread, .book, .sheet { view-transition-class: book; }
 ::view-transition-group(*.book) { animation-duration: 420ms; }
 ::view-transition-new(*.turn):only-child { animation: vt-fade-in 220ms 340ms both; transform: none; }
 ::view-transition-old(*.turn):only-child { animation: vt-fade-out 160ms both; transform: none; }

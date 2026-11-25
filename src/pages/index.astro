@@ -4,7 +4,7 @@ import Book from "../components/Book.astro";
 import { shelf, welcomeParas } from "../data/books";
 import { portrait, ledgeTile } from "../lib/pixel";
 
-const HOME_H1 = "Welcome to my library";
+const HOME_H1 = "Four projects, one semester of technical writing";
 ---
 
 <Base title="Home" current="home" description="Liam Reeves’s ENGL 3342 technical communication portfolio: four modules, a CS writing style guide, and a professional bio, shelved as six books.">
@@ -29,7 +29,7 @@ const HOME_H1 = "Welcome to my library";
       <figcaption>Placeholder: Liam’s photo or pixel avatar goes here.</figcaption>
     </figure>
     <div class="welcome-text">
-      <h2 id="hi">Welcome to my shelf.</h2>
+      <h2 id="hi">Welcome to my library.</h2>
       {welcomeParas.map((p) => <p>{p}</p>)}
     </div>
   </section>
