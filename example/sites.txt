@@ -1,0 +1,5 @@
+most applicable site: https://stripe.press/
+What I like and want to use:
+I really like the bookshelf idea, where you can click on the different books and it opens up to the content you want. There are hover animations where your cursor is to identify which book you would select if you clicked. When you select a book it smoothly transitions to a page that highlights the the books purpose and renders the entire book. I don't want this, I want every module to be a book and when a book is selectd it should open into a "table of contents" page where you can select the module content you wish. When you click on a line in the table of contents I want the book to expand to full screen and transition to the content selected. exiting from the selected content should flip the pages back to the table of content page, and exiting the book should put the book back on a bookshelf next to the other modules. 
+unlike stirpe, I don't want these books to be photo realistic. I would prefer if thses pooks had a pixel art like construction. 
+ask if you have any questions about the direcion or design.
