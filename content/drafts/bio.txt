@@ -1,0 +1,6 @@
+Liam Reeves is a senior computer science major at the University of Texas Rio Grande Valley, expected to graduate in December 2027. As an undergraduate researcher in the SMART 2.0 program, he models how extreme heat delays freight rail across 2,573 U.S. counties. He presented that work at the SMART 2.0 Symposium and is first author of the resulting paper for the INNOVARail 2027 conference. He is also product owner for Shortlist, an internship-tracking platform, where he writes the user stories, data dictionary, and API specification his team builds from.
+Where these skills go next
+In internships, Liam will write requirements and documentation that a developer or analyst can act on without a follow-up meeting. In graduate school, where he plans to apply to the M.S. program at UTRGV, he will write research for readers outside his specialty. In a career building AI tools, he will test documents with real users, as he did with a campus parking website, and disclose AI use as plainly as this portfolio does.
+Contact
+Email: liam.reeves01@utrgv.edu
+GitHub: github.com/liamreeves34
