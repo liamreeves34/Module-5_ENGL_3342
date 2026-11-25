@@ -1,16 +1,69 @@
 ---
+import Base from "../layouts/Base.astro";
+import Book from "../components/Book.astro";
+import { shelf, welcomeParas } from "../data/books";
+import { portrait, ledgeTile } from "../lib/pixel";
+
+const HOME_H1 = "Six books from one semester of technical writing";
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Base title="Home" current="home" description="Liam Reeves’s ENGL 3342 technical communication portfolio: four modules, a CS writing style guide, and a professional bio, shelved as six books.">
+  <section class="stage" aria-labelledby="shelf-title">
+    <div class="now">
+      <h1 id="shelf-title" data-home={HOME_H1}>{HOME_H1}</h1>
+      <p class="meta" data-home-meta><b>Modules 1–4</b> · Style Guide · Bio<br />Pick a book to open it</p>
+    </div>
+    <p class="sr-only" aria-live="polite" data-announce></p>
+    <div class="shelf">
+      <div class="row">
+        {shelf.map((b) => <Book book={b} />)}
+      </div>
+      <div class="ledge" aria-hidden="true" style={`background-image:${ledgeTile()}`}></div>
+    </div>
+    <p class="hint"><span>Hover a spine to pull it out. Click to open the book.</span><span class="keys"><kbd>Tab</kbd> moves between books</span></p>
+  </section>
+
+  <section class="welcome" aria-labelledby="hi">
+    <figure class="portrait">
+      <Fragment set:html={portrait()} />
+      <figcaption>Placeholder: Liam’s photo or pixel avatar goes here.</figcaption>
+    </figure>
+    <div class="welcome-text">
+      <h2 id="hi">Welcome to my shelf.</h2>
+      {welcomeParas.map((p) => <p>{p}</p>)}
+    </div>
+  </section>
+</Base>
+
+<script>
+  // Hovering or focusing a book swaps the h1 to that book's title and announces it politely;
+  // leaving restores the Home heading.
+  function initShelf() {
+    const h1 = document.querySelector<HTMLElement>("[data-home]");
+    const meta = document.querySelector<HTMLElement>("[data-home-meta]");
+    const live = document.querySelector<HTMLElement>("[data-announce]");
+    if (!h1 || !meta || !live) return;
+    const homeMeta = meta.innerHTML;
+    let leaveTimer = 0;
+    const show = (a: HTMLAnchorElement) => {
+      clearTimeout(leaveTimer);
+      if (h1.textContent === a.dataset.title) return;
+      h1.textContent = a.dataset.title ?? "";
+      meta.textContent = a.dataset.meta ?? "";
+      live.textContent = a.dataset.title ?? "";
+    };
+    const reset = () => {
+      leaveTimer = window.setTimeout(() => {
+        h1.textContent = h1.dataset.home ?? "";
+        meta.innerHTML = homeMeta;
+      }, 60);
+    };
+    document.querySelectorAll<HTMLAnchorElement>(".book").forEach((a) => {
+      a.addEventListener("mouseenter", () => show(a));
+      a.addEventListener("focus", () => show(a));
+      a.addEventListener("mouseleave", reset);
+      a.addEventListener("blur", reset);
+    });
+  }
+  document.addEventListener("astro:page-load", initShelf);
+</script>

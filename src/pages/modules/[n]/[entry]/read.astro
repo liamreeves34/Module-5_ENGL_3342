@@ -1,0 +1,47 @@
+---
+// Full-screen reading view for one document: description and facts on the left, a large PDF
+// viewer on the right, and an always-visible "Open PDF" link because many mobile browsers
+// (Android Chrome especially) do not render PDFs inline. The viewer falls back to the
+// first-page image when the browser cannot embed the PDF.
+import Base from "../../../../layouts/Base.astro";
+import { modules, type ModuleBook, type Doc } from "../../../../data/books";
+import { url } from "../../../../lib/url";
+
+export function getStaticPaths() {
+  return modules.flatMap((book) => book.docs.map((doc) => ({ params: { n: String(book.n), entry: doc.slug }, props: { book, doc } })));
+}
+interface Props { book: ModuleBook; doc: Doc }
+const { book, doc } = Astro.props;
+const entryNo = book.docs.indexOf(doc) + 2;
+const pp = doc.pages === 1 ? "1 page" : `${doc.pages} pages`;
+---
+
+<Base title={`${doc.title} · ${book.code}`} current={book.n} description={`${doc.title}, from ${book.code} of Liam Reeves’s portfolio. ${doc.summary[0]}`}>
+  <div class="reader" style={`--cloth:${book.cloth}`}>
+    <article class="sheet" transition:name={`book-${book.id}`} aria-labelledby="doc-title">
+      <div class="bar">
+        <a class="back" href={url(`modules/${book.n}/${doc.slug}`)} data-esc><span class="arr" aria-hidden="true"></span>Back to contents <kbd aria-hidden="true">Esc</kbd></a>
+        <div class="doc">
+          <h1 id="doc-title">{doc.title}</h1>
+          <span>{book.code} · Entry {entryNo} of {book.docs.length + 1}</span>
+        </div>
+        <a class="openpdf" href={url(doc.pdf)} target="_blank" rel="noopener">Open PDF in new tab<span class="sr-only">: {doc.title}, {pp}</span><span class="expand" aria-hidden="true"></span></a>
+      </div>
+      <div class="cols">
+        <div class="about">
+          <h2>About this document</h2>
+          {doc.summary.map((s) => <p>{s}</p>)}
+          <dl>{doc.facts.map(([k, v]) => <div><dt>{k}</dt><dd>{v}</dd></div>)}</dl>
+        </div>
+        <div class="viewer">
+          <object data={url(doc.pdf)} type="application/pdf" title={`${doc.title} (PDF, ${pp})`}>
+            <div class="fallback">
+              <img src={url(doc.preview)} alt={`First page of ${doc.title}`} width="320" height="414" loading="lazy" />
+              <p>This browser can’t show the PDF inside the page. <a href={url(doc.pdf)} target="_blank" rel="noopener">Open {doc.title} ({pp}, PDF)</a>.</p>
+            </div>
+          </object>
+        </div>
+      </div>
+    </article>
+  </div>
+</Base>

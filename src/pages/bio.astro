@@ -1,0 +1,30 @@
+---
+// Third-person professional bio on the left page; future application and contact on the right.
+import Base from "../layouts/Base.astro";
+import Spread from "../components/Spread.astro";
+import { bio, bioContent } from "../data/books";
+---
+
+<Base title="Bio" current="bio" description="Professional bio of Liam Reeves, computer science student at UTRGV, with future plans and contact details.">
+  <Spread id={bio.id} cloth={bio.cloth} kick={bio.kick} h={72}
+    where="<b>Bio</b> · Professional profile · Contact"
+    leftLabel="Professional bio" rightLabel="Future application and contact">
+    <Fragment slot="left">
+      <p class="kick">Professional bio</p>
+      <h1>Liam Reeves</h1>
+      <div class="bio-body"><p>{bioContent.bio}</p></div>
+    </Fragment>
+    <Fragment slot="right">
+      <p class="kick">Future application</p>
+      <h2>{bioContent.nextHead}</h2>
+      <div class="bio-body"><p>{bioContent.next}</p></div>
+      <div class="contact">
+        <h3>Contact</h3>
+        <dl>
+          <div><dt>Email</dt><dd><a href="mailto:liam.reeves01@utrgv.edu">liam.reeves01@utrgv.edu</a></dd></div>
+          <div><dt>GitHub</dt><dd><a href="https://github.com/liamreeves34">github.com/liamreeves34</a></dd></div>
+        </dl>
+      </div>
+    </Fragment>
+  </Spread>
+</Base>

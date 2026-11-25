@@ -1,0 +1,96 @@
+---
+import { ClientRouter } from "astro:transitions";
+import "../styles/global.css";
+import { modules } from "../data/books";
+import { url } from "../lib/url";
+
+interface Props {
+  title: string;
+  description: string;
+  /** Which nav entry is current: home, a module number, guide or bio. */
+  current: "home" | "guide" | "bio" | number;
+}
+const { title, description, current } = Astro.props;
+const fullTitle = current === "home" ? "Liam Reeves · Technical Communication Portfolio" : `${title} · Liam Reeves`;
+const onModule = typeof current === "number";
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href={url("favicon.svg")} />
+    <link rel="preload" href={url("fonts/atkinson-hyperlegible-next-latin.woff2")} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={url("fonts/barlow-semi-condensed-700-latin.woff2")} as="font" type="font/woff2" crossorigin />
+    <meta name="theme-color" content="#EEF3E4" />
+    <ClientRouter />
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <header class="top">
+      <a class="who" href={url()}><strong>Liam Reeves</strong><span>ENGL 3342 · Technical Communication Portfolio</span></a>
+      <button class="menu-btn" type="button" aria-expanded="false" aria-controls="site-nav"><i aria-hidden="true"></i>Menu</button>
+      <nav id="site-nav" aria-label="Main">
+        <ul class="nav-list">
+          <li><a href={url()} aria-current={current === "home" ? "page" : undefined}>Home</a></li>
+          <li>
+            <details class="mods">
+              <summary aria-current={onModule ? "true" : undefined}>Modules<span class="caret" aria-hidden="true"></span></summary>
+              <ul>
+                {modules.map((m) => (
+                  <li>
+                    <a href={url(`modules/${m.n}`)} aria-current={current === m.n ? "page" : undefined}>
+                      <b>Module {m.n}</b> {m.title}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </details>
+          </li>
+          <li><a href={url("style-guide")} aria-current={current === "guide" ? "page" : undefined}>Style Guide</a></li>
+          <li><a href={url("bio")} aria-current={current === "bio" ? "page" : undefined}>Bio</a></li>
+        </ul>
+      </nav>
+    </header>
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    <footer class="foot-note">
+      <p>Liam Reeves · Department of Computer Science, University of Texas Rio Grande Valley · ENGL 3342, Fall 2026</p>
+      <p>AI disclosure: Claude (Anthropic) helped design and build this site and drafted its copy from my own documents for me to revise.</p>
+    </footer>
+    <script>
+      // Small enhancements only; every page works without them.
+      function setup() {
+        document.documentElement.classList.add("js");
+        const btn = document.querySelector<HTMLButtonElement>(".menu-btn");
+        const nav = document.getElementById("site-nav");
+        btn?.addEventListener("click", () => {
+          const open = btn.getAttribute("aria-expanded") !== "true";
+          btn.setAttribute("aria-expanded", String(open));
+          nav?.classList.toggle("open", open);
+        });
+      }
+      // Close the Modules menu on outside click (document-level, so registered once).
+      document.addEventListener("click", (e) => {
+        const d = document.querySelector<HTMLDetailsElement>("details.mods");
+        if (d?.open && !d.contains(e.target as Node)) d.open = false;
+      });
+      // Esc closes an open menu first; otherwise it follows the page's "back" link.
+      document.addEventListener("keydown", (e) => {
+        if (e.key !== "Escape" || e.defaultPrevented) return;
+        const d = document.querySelector<HTMLDetailsElement>("details.mods[open]");
+        if (d) { d.open = false; d.querySelector("summary")?.focus(); return; }
+        const btn = document.querySelector<HTMLButtonElement>(".menu-btn[aria-expanded='true']");
+        if (btn) { btn.click(); btn.focus(); return; }
+        const t = e.target as HTMLElement;
+        if (t.closest("input, textarea, select, object, iframe")) return;
+        document.querySelector<HTMLAnchorElement>("a[data-esc]")?.click();
+      });
+      document.addEventListener("astro:page-load", setup);
+    </script>
+  </body>
+</html>

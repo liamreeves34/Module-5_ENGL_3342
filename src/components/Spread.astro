@@ -1,0 +1,36 @@
+---
+// The open book. At 1100px and wider: a two-page spread on a pixel board in the book's cloth.
+// Below that, the pages stack full-width (max 720px), left page first.
+import { spreadFrame } from "../lib/pixel";
+import { url } from "../lib/url";
+
+interface Props {
+  id: string;
+  cloth: string;
+  kick: string;
+  /** Spread height in 8px cells. */
+  h: number;
+  where: string;
+  leftLabel: string;
+  rightLabel: string;
+  /** Right page's transition name: entries of one book share it so the page turns. */
+  turn?: string;
+}
+const { id, cloth, kick, h, where, leftLabel, rightLabel, turn } = Astro.props;
+---
+
+<div class="crumbs">
+  <a class="back" href={url()} data-esc><span class="arr" aria-hidden="true"></span>Back to shelf <kbd aria-hidden="true">Esc</kbd></a>
+  <p class="where"><Fragment set:html={where} /></p>
+</div>
+<div class="spread-wrap">
+  <div class="spread" style={`--cloth:${cloth};--kick:${kick};--spread-h:${h * 8}px`} transition:name={`book-${id}`}>
+    <Fragment set:html={spreadFrame(cloth, h)} />
+    <section class="pg left" aria-label={leftLabel}>
+      <slot name="left" />
+    </section>
+    <section class="pg right" aria-label={rightLabel} transition:name={turn}>
+      <slot name="right" />
+    </section>
+  </div>
+</div>

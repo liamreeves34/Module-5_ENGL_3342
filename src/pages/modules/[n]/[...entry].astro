@@ -1,0 +1,81 @@
+---
+// An open module book. /modules/2 shows the reflection on the right page (read first);
+// /modules/2/manual shows that document's preview. Each is a real page; the page-turn
+// between them is a view transition layered on top.
+import Base from "../../../layouts/Base.astro";
+import Spread from "../../../components/Spread.astro";
+import { modules, type ModuleBook, type Doc } from "../../../data/books";
+import { url } from "../../../lib/url";
+
+export function getStaticPaths() {
+  return modules.flatMap((book) => [
+    { params: { n: String(book.n), entry: undefined }, props: { book, doc: undefined } },
+    ...book.docs.map((doc) => ({ params: { n: String(book.n), entry: doc.slug }, props: { book, doc } })),
+  ]);
+}
+interface Props { book: ModuleBook; doc?: Doc }
+const { book, doc } = Astro.props;
+const base = `modules/${book.n}`;
+const entryNo = doc ? book.docs.indexOf(doc) + 2 : 1;
+const total = book.docs.length + 1;
+const pp = (n: number) => (n === 1 ? "1 p." : `${n} pp.`);
+---
+
+<Base
+  title={doc ? `${doc.title} · ${book.code}` : `${book.code}: ${book.title}`}
+  current={book.n}
+  description={`${book.code} of Liam Reeves’s technical communication portfolio: ${book.title}. Reflection and documents.`}
+>
+  <Spread
+    id={book.id}
+    cloth={book.cloth}
+    kick={book.kick}
+    h={book.spreadH ?? 78}
+    where={`<b>${book.code}</b> · ${book.where}`}
+    leftLabel="Contents"
+    rightLabel={doc ? doc.title : "Reflection"}
+    turn={`page-${book.id}`}
+  >
+    <Fragment slot="left">
+      <p class="kick">{book.runningHead}</p>
+      <h1>{book.title}</h1>
+      <ol class="toc">
+        <li>
+          <a href={url(base)} aria-current={!doc ? "page" : undefined}>
+            <span class="n">1</span><span class="t">Reflection<small>What I did, what challenged me, what worked</small></span><span class="p">Read first</span>
+          </a>
+        </li>
+        {book.docs.map((d, i) => (
+          <li>
+            <a href={url(`${base}/${d.slug}`)} aria-current={doc === d ? "page" : undefined}>
+              <span class="n">{i + 2}</span><span class="t">{d.title}<small>{d.sub}</small></span><span class="p">{pp(d.pages)}</span>
+            </a>
+          </li>
+        ))}
+      </ol>
+      <p class="foot"><b>{book.foot[0]}:</b> {book.foot[1]}</p>
+    </Fragment>
+
+    <Fragment slot="right">
+      <p class="kick">Entry {entryNo} of {total}{doc && ` · ${pp(doc.pages)}`}</p>
+      {doc ? (
+        <>
+          <h2>{doc.title}</h2>
+          <div class="preview">
+            <img src={url(doc.preview)} alt={`First page of ${doc.title}`} width="190" height="246" loading="eager" decoding="async" />
+            <div class="body">{doc.summary.map((s) => <p>{s}</p>)}</div>
+          </div>
+          <div class="actions">
+            <a class="readbtn" href={url(`${base}/${doc.slug}/read`)}>Read full screen<span class="expand" aria-hidden="true"></span></a>
+            <a class="pdflink" href={url(doc.pdf)} target="_blank" rel="noopener">Open PDF<span class="sr-only">: {doc.title}, {pp(doc.pages)} (opens in a new tab)</span></a>
+          </div>
+        </>
+      ) : (
+        <>
+          <h2>Reflection</h2>
+          <div class="body">{book.reflection.map((p) => <p>{p}</p>)}</div>
+        </>
+      )}
+    </Fragment>
+  </Spread>
+</Base>

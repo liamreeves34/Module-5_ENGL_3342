@@ -1,0 +1,30 @@
+---
+// The whole guide on one spread, no contents page: title, intro and principle 1 on the
+// left page; principles 2-4 on the right.
+import Base from "../layouts/Base.astro";
+import Spread from "../components/Spread.astro";
+import { guide, guideContent } from "../data/books";
+const { intro, principles } = guideContent;
+const [first, ...rest] = principles;
+---
+
+<Base title="Style Guide" current="guide" description="A beginner’s guide to communicating in computer science: four principles drawn from Liam Reeves’s ENGL 3342 work.">
+  <Spread id={guide.id} cloth={guide.cloth} kick={guide.kick} h={70}
+    where={`<b>Style Guide</b> · ${principles.length} principles for CS writing`}
+    leftLabel="Introduction and principle 1" rightLabel={`Principles 2 to ${principles.length}`}>
+    <Fragment slot="left">
+      <p class="kick">Style guide · For CS beginners</p>
+      <h1>Communication Style &amp; Strategy Guide</h1>
+      <p class="lede">{intro}</p>
+      <ol class="rules">
+        <li><span class="n" aria-hidden="true">{first.n}</span><div><h2>{first.title}</h2><p>{first.body}</p></div></li>
+      </ol>
+    </Fragment>
+    <Fragment slot="right">
+      <p class="kick">Principles 2–{principles.length}</p>
+      <ol class="rules" start="2">
+        {rest.map((p) => <li><span class="n" aria-hidden="true">{p.n}</span><div><h2>{p.title}</h2><p>{p.body}</p></div></li>)}
+      </ol>
+    </Fragment>
+  </Spread>
+</Base>

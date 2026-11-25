@@ -1,0 +1,36 @@
+---
+// One book on the shelf: a spine at rest, swapped for its face-out cover on hover or focus.
+// Titles are real text over decorative pixel art.
+import { spine, cover } from "../lib/pixel";
+import type { ModuleBook, RefBook } from "../data/books";
+import { url } from "../lib/url";
+
+interface Props { book: ModuleBook | RefBook }
+const { book } = Astro.props;
+const href = book.kind === "module" ? url(`modules/${book.n}`) : url(book.href);
+const entries = book.kind === "module" ? `${book.docs.length + 1} entries` : book.kind === "guide" ? "4 principles" : "Bio · Contact";
+const label = book.kind === "module" ? `${book.code}: ${book.title}` : book.title;
+---
+
+<a
+  class="book"
+  href={href}
+  data-title={book.title}
+  data-meta={book.kind === "module" ? `${book.code} · ${entries}` : entries}
+  aria-label={label}
+  style={`--ink-on:${book.text}`}
+  data-bg={book.cloth}
+  transition:name={`book-${book.id}`}
+>
+  <span class="spine">
+    <Fragment set:html={spine(book)} />
+    <span class="spine-title">{book.short}</span>
+    <span class="spine-code">{book.code}</span>
+  </span>
+  <span class="face">
+    <Fragment set:html={cover(book)} />
+    <span class="cover-title"><span class="cover-code">{book.code}</span><span class="cover-name">{book.short}</span></span>
+    <span class="cover-by">Liam Reeves</span>
+    <span class="dim" aria-hidden="true"><i></i><b>{entries}</b><i></i></span>
+  </span>
+</a>
