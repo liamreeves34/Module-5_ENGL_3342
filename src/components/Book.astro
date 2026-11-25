@@ -21,6 +21,7 @@ const label = book.kind === "module" ? `${book.code}: ${book.title}` : book.titl
   style={`--ink-on:${book.text}`}
   data-bg={book.cloth}
   data-id={book.id}
+  data-spread-h={book.kind === "module" ? (book.spreadH ?? 78) : book.spreadH}
   transition:name={`book-${book.id}`}
 >
   <span class="spine">

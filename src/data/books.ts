@@ -183,15 +183,17 @@ export interface RefBook extends Cloth {
   href: string;
   text: string;
   kick: string;
+  /** Open-spread height in cells. */
+  spreadH: number;
 }
 
 export const guide: RefBook = {
   kind: "guide", id: "sg", code: "Guide", short: "CS Writing Style Guide", title: "Communication Style & Strategy Guide", href: "style-guide",
-  cloth: "#EC7F45", band: "#1F2A1D", panel: "#FBE3D7", iconA: "#F2C14E", iconB: "#DD5A26", text: "#1F2A1D", icon: "pencil", W: 9, H: 38, kick: "#9C4718",
+  cloth: "#EC7F45", band: "#1F2A1D", panel: "#FBE3D7", iconA: "#F2C14E", iconB: "#DD5A26", text: "#1F2A1D", icon: "pencil", W: 9, H: 38, kick: "#9C4718", spreadH: 70,
 };
 export const bio: RefBook = {
   kind: "bio", id: "bio", code: "Bio", short: "About Me", title: "Professional Bio & Future Plans", href: "bio",
-  cloth: "#2B3328", band: "#B9CC9E", panel: "#E3EBD5", iconA: "#B9CC9E", iconB: "#2B3328", text: "#EEF3E4", icon: "person", W: 10, H: 41, kick: "#2B3328",
+  cloth: "#2B3328", band: "#B9CC9E", panel: "#E3EBD5", iconA: "#B9CC9E", iconB: "#2B3328", text: "#EEF3E4", icon: "person", W: 10, H: 41, kick: "#2B3328", spreadH: 72,
 };
 
 /** Style guide draft: line 1 intro, then heading/body pairs ("1. Heading"). */
