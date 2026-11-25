@@ -145,6 +145,9 @@ function shelfPose(f: Fly, book: HTMLElement) {
 let pendingOpen: Promise<unknown> | null = null;
 let snapNext = false;
 let busy = false;
+/** Duration multiplier: switching straight from one book to another runs both halves a little faster. */
+let pace = 1;
+const ms = (d: number) => Math.round(d * pace);
 
 async function openBook(book: HTMLAnchorElement) {
   const art: Art = JSON.parse(book.dataset.art!);
@@ -156,15 +159,25 @@ async function openBook(book: HTMLAnchorElement) {
 
   // Lift out of the slot, then glide while turning to face the reader; one animation so the
   // two phases join without a pause.
-  const glide = { duration: 420, easing: "linear" };
-  turnShade(f, p0.deg, 0, { duration: 420, easing: EASE_GLIDE });
+  const glide = { duration: ms(420), easing: "linear" };
+  turnShade(f, p0.deg, 0, { duration: ms(420), easing: EASE_GLIDE });
   await run(f.el, [
     { transform: pose(p0.x, p0.y, p0.s, p0.deg), easing: "ease-out" },
     { transform: pose(p0.x, p0.y - 18, p0.s, p0.deg), offset: 0.16, easing: EASE_GLIDE },
     { transform: pose(to.x, to.y, to.s, 0) },
   ], glide);
-  await swing(f, true, 300);
-  if (!to.wide) await run(f.el, [{ opacity: 1 }, { opacity: 0 }], { duration: 120 });
+  await swing(f, true, ms(300));
+  if (!to.wide) await run(f.el, [{ opacity: 1 }, { opacity: 0 }], { duration: ms(120) });
+}
+
+/** Take a book off the shelf and open it, navigating to its page when it lands. */
+function startOpen(book: HTMLAnchorElement, history: "push" | "replace" = "push") {
+  busy = true;
+  document.documentElement.dataset.bookMotion = "open";
+  closeMenus();
+  pendingOpen = openBook(book).catch(() => {});
+  snapNext = true;
+  navigate(book.href, { history });     // loads while the book opens; swaps when it is done
 }
 
 function bindShelf() {
@@ -172,11 +185,7 @@ function bindShelf() {
     book.addEventListener("click", (e) => {
       if (busy || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || reduced()) return;
       e.preventDefault();
-      busy = true;
-      document.documentElement.dataset.bookMotion = "open";
-      pendingOpen = openBook(book).catch(() => {});
-      snapNext = true;
-      navigate(book.href);               // loads while the book opens; swaps when it is done
+      startOpen(book);
     });
   });
 }
@@ -185,25 +194,26 @@ function bindShelf() {
 
 let closing: { fly: Fly; from: { x: number; y: number; s: number } } | null = null;
 
-async function closeBook(spread: HTMLElement) {
-  const art: Art = JSON.parse(spread.dataset.art!);
-  const wide = document.documentElement.clientWidth >= 1100;
+async function closeBook(open: HTMLElement) {
+  const art: Art = JSON.parse(open.dataset.art!);
+  const spreadArt = open.querySelector(".spread-art");
+  const wide = document.documentElement.clientWidth >= 1100 && !!spreadArt && getComputedStyle(spreadArt).display !== "none";
   const f = buildFly(art, wide);
   let at: { x: number; y: number; s: number };
   if (wide) {
     // Lay the open book exactly over the spread; fading it in fades the text off the pages.
-    const r = spread.querySelector(".spread-art")!.getBoundingClientRect();
+    const r = spreadArt!.getBoundingClientRect();
     at = { x: r.left + W, y: r.top, s: 1 };
     f.el.style.transform = pose(at.x, at.y, 1, 0);
-    await fadeIn(f.el, 120);
-    spread.style.visibility = "hidden";   // the book now stands in for it; nothing shows through
-    await swing(f, false, 280);
+    await fadeIn(f.el, ms(120));
+    open.style.visibility = "hidden";     // the book now stands in for it; nothing shows through
+    await swing(f, false, ms(280));
   } else {
-    // Stacked pages: a closed book appears over them.
+    // Stacked pages or the full-screen reading view: a closed book appears over them.
     const to = spreadSpot(art);
     at = { x: to.x - (W * to.s) / 2, y: to.y, s: to.s };
     f.el.style.transform = pose(at.x, at.y, at.s, 0);
-    await fadeIn(f.el, 200);
+    await fadeIn(f.el, ms(200));
   }
   closing = { fly: f, from: at };
 }
@@ -219,15 +229,63 @@ async function shelveBook() {
   const r = book.querySelector(".spine")!.getBoundingClientRect();
   const s0 = f.art.faceH / f.H;
   const end = { x: r.right, y: r.top, s: s0 };
-  turnShade(f, 0, 90, { duration: 400, easing: EASE_GLIDE });
+  turnShade(f, 0, 90, { duration: ms(400), easing: EASE_GLIDE });
   await run(f.el, [
     { transform: pose(from.x, from.y, from.s, 0), easing: EASE_GLIDE },
     { transform: pose(end.x, end.y - 18, end.s, 90), offset: 0.82, easing: "ease-in" },
     { transform: pose(end.x, end.y, end.s, 90) },
-  ], { duration: 400, easing: "linear" });
+  ], { duration: ms(400), easing: "linear" });
   book.style.visibility = "";
   f.el.remove();
 }
+
+// ---------------------------------------------------------------- the navigation menu
+//
+// Home, Modules, Style Guide and Bio animate too: from the shelf they open the chosen book;
+// from an open book they close it (Home), or close it and then open the chosen one.
+
+/** Which book a URL is the front of: /modules/2 → m2, /style-guide → sg, /bio → bio. */
+function bookAt(pathname: string): string | null {
+  const p = "/" + pathname.slice(home().length).replace(/\/+$/, "");
+  const m = p.match(/^\/modules\/(\d+)$/);
+  if (m) return "m" + m[1];
+  return p === "/style-guide" ? "sg" : p === "/bio" ? "bio" : null;
+}
+const openBookEl = () => document.querySelector<HTMLElement>(".spread[data-art], .sheet[data-art]");
+const shelfBook = (id: string) => document.querySelector<HTMLAnchorElement>(`a.book[data-art*='"id":"${id}"']`);
+function closeMenus() {
+  document.querySelectorAll<HTMLDetailsElement>("details.mods[open]").forEach((d) => (d.open = false));
+  const btn = document.querySelector<HTMLButtonElement>(".menu-btn[aria-expanded='true']");
+  if (btn) btn.click();
+}
+
+/** After closing a book on the way to another one, open that one from the shelf. */
+let chainTo: string | null = null;
+
+document.addEventListener("click", (e) => {
+  const a = (e.target as Element).closest?.("a[href]") as HTMLAnchorElement | null;
+  if (!a || a.matches("a.book") || a.target || a.hasAttribute("download")) return;
+  if (busy || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || reduced()) return;
+  const to = new URL(a.href, location.href);
+  if (to.origin !== location.origin) return;
+  const target = bookAt(to.pathname);
+  if (!target) return;                       // Home and in-book links are handled on navigation
+  const open = openBookEl();
+  if (!open) {
+    const book = shelfBook(target);           // on the shelf: open the chosen book
+    if (!book) return;
+    e.preventDefault();
+    startOpen(book);
+    return;
+  }
+  const current = (JSON.parse(open.dataset.art!) as Art).id;
+  if (current === target && !open.matches(".sheet")) return;   // already in this book: page turn
+  // Another book: close this one onto the shelf, then open the chosen one.
+  e.preventDefault();
+  chainTo = target;
+  pace = 0.8;
+  navigate(home());
+}, true);
 
 // ---------------------------------------------------------------- router hooks
 
@@ -238,12 +296,13 @@ document.addEventListener("astro:before-preparation", (e) => {
     wait = pendingOpen;
     pendingOpen = null;
   } else {
-    const spread = document.querySelector<HTMLElement>(".spread[data-art]");
-    if (spread && !busy && !reduced() && ev.to.pathname === home()) {
+    const open = openBookEl();
+    if (open && !busy && !reduced() && ev.to.pathname === home()) {
       busy = true;
       snapNext = true;
       document.documentElement.dataset.bookMotion = "close";
-      wait = closeBook(spread).catch(() => {});
+      closeMenus();
+      wait = closeBook(open).catch(() => {});
     }
   }
   if (!wait) return;
@@ -273,6 +332,21 @@ document.addEventListener("astro:page-load", () => {
   busy = false;
   bindShelf();
   // Measure the slot one frame later, once the swapped-in page has settled its layout.
-  if (closing) requestAnimationFrame(() => shelveBook().finally(() => delete document.documentElement.dataset.bookMotion));
-  else delete document.documentElement.dataset.bookMotion;
+  if (closing) {
+    busy = true;
+    requestAnimationFrame(() => shelveBook().finally(() => {
+      delete document.documentElement.dataset.bookMotion;
+      busy = false;
+      const next = chainTo && shelfBook(chainTo);
+      chainTo = null;
+      // Switching books: the closed book is back on the shelf; take the chosen one down. It
+      // replaces the shelf's history entry, so Back returns to the previous book.
+      if (next) startOpen(next, "replace");
+      else pace = 1;
+    }));
+  } else {
+    delete document.documentElement.dataset.bookMotion;
+    pace = 1;
+    chainTo = null;
+  }
 });

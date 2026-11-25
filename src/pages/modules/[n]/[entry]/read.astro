@@ -4,7 +4,7 @@
 // (Android Chrome especially) do not render PDFs inline. The viewer falls back to the
 // first-page image when the browser cannot embed the PDF.
 import Base from "../../../../layouts/Base.astro";
-import { modules, type ModuleBook, type Doc } from "../../../../data/books";
+import { modules, artOf, type ModuleBook, type Doc } from "../../../../data/books";
 import { url } from "../../../../lib/url";
 
 export function getStaticPaths() {
@@ -18,7 +18,7 @@ const pp = doc.pages === 1 ? "1 page" : `${doc.pages} pages`;
 
 <Base title={`${doc.title} · ${book.code}`} current={book.n} description={`${doc.title}, from ${book.code} of Liam Reeves’s portfolio. ${doc.summary[0]}`}>
   <div class="reader" style={`--cloth:${book.cloth}`}>
-    <article class="sheet" transition:name={`book-${book.id}`} aria-labelledby="doc-title">
+    <article class="sheet" data-art={artOf(book)} transition:name={`book-${book.id}`} aria-labelledby="doc-title">
       <div class="bar">
         <a class="back" href={url(`modules/${book.n}/${doc.slug}`)} data-esc><span class="arr" aria-hidden="true"></span>Back to contents <kbd aria-hidden="true">Esc</kbd></a>
         <div class="doc">
