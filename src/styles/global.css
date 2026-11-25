@@ -3,9 +3,9 @@
 /* Direction A: engineering computation pad. Ported from the approved mockups
    (.impeccable/mocks/flow/src/build.py, build2.py, build3.py). */
 
-@font-face { font-family: "Atkinson Next"; src: url("/fonts/atkinson-hyperlegible-next-latin.woff2") format("woff2"); font-weight: 200 800; font-display: swap;
+@font-face { font-family: "Nunito"; src: url("/fonts/nunito-latin.woff2") format("woff2"); font-weight: 200 1000; font-display: swap;
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
-@font-face { font-family: "Atkinson Next"; src: url("/fonts/atkinson-hyperlegible-next-latin-ext.woff2") format("woff2"); font-weight: 200 800; font-display: swap;
+@font-face { font-family: "Nunito"; src: url("/fonts/nunito-latin-ext.woff2") format("woff2"); font-weight: 200 1000; font-display: swap;
   unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
 @font-face { font-family: "Barlow SC"; src: url("/fonts/barlow-semi-condensed-700-latin.woff2") format("woff2"); font-weight: 700; font-display: swap;
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
@@ -23,7 +23,7 @@
   --stock: #F7F6EE;
   --shadow: rgba(31, 42, 29, .28);
   --display: "Barlow SC", "Arial Narrow", sans-serif;
-  --body: "Atkinson Next", system-ui, sans-serif;
+  --body: "Nunito", system-ui, sans-serif;
   --cell: 8px;
   color-scheme: light;
   scrollbar-color: #9DB585 var(--ground);
@@ -32,7 +32,7 @@
 /* ---------- base ---------- */
 html { -webkit-font-smoothing: antialiased; }
 body {
-  font-family: var(--body); color: var(--ink); font-size: 18px; line-height: 1.6;
+  font-family: var(--body); font-weight: 500; color: var(--ink); font-size: 18px; line-height: 1.6;
   background-color: var(--ground);
   background-image:
     linear-gradient(rgba(70,110,60,.20) 1px, transparent 1px),
@@ -111,9 +111,9 @@ main:focus { outline: none; }
 .hint { padding: 14px 0 0; text-align: center; font-size: 16px; color: var(--ink-2); }
 
 /* ---------- home: welcome ---------- */
-.welcome { display: grid; grid-template-columns: 240px minmax(0, 68ch); gap: 56px; justify-content: center; padding: 72px 48px 96px; }
+.welcome { display: grid; grid-template-columns: 240px minmax(0, 74ch); gap: 56px; justify-content: center; padding: 72px 48px 96px; }
 .welcome h2 { font-family: var(--display); font-weight: 700; font-size: 40px; line-height: 1.05; letter-spacing: -0.015em; margin-bottom: 20px; }
-.welcome-text { background: var(--ground); }
+.welcome-text { background: var(--stock); border: 2px solid var(--ink); padding: 36px 44px 40px; box-shadow: 6px 10px 14px rgba(31,42,29,.16); }
 .welcome-text p + p { margin-top: 1em; }
 .portrait figcaption { font-size: 14px; color: var(--ink-2); margin-top: 10px; line-height: 1.4; }
 
@@ -303,6 +303,7 @@ main:focus { outline: none; }
   .hint { padding: 12px 20px 0; text-align: left; }
   .welcome { grid-template-columns: 1fr; gap: 24px; padding: 48px 20px 64px; }
   .welcome h2 { font-size: 32px; }
+  .welcome-text { padding: 24px 20px 28px; }
   .crumbs { padding: 16px 20px 0; flex-direction: column; align-items: flex-start; gap: 10px; }
   .crumbs .where { text-align: left; }
   .back kbd { display: none; }

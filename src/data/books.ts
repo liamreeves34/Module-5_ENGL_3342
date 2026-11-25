@@ -142,7 +142,7 @@ export const modules: ModuleBook[] = [
   {
     kind: "module", id: "m4", n: 4, code: "Module 4", short: "AI Literacy & Job Materials",
     title: "AI Literacy, Resume & Cover Letter",
-    runningHead: "Module 4 · AI literacy and job materials", where: "4 entries · Fall 2026",
+    runningHead: "Module 4 · AI literacy and job materials", where: "4 entries · Fall 2027",
     cloth: "#7A2338", band: "#F2C14E", panel: "#F6E1E5", iconA: "#F2C14E", iconB: "#7A2338", text: "#FFFFFF", icon: "bulb", kick: "#7A2338",
     foot: ["Credits", "Workshop and flyer made with Tim Trasmonte."],
     reflection: paras(m4r),
