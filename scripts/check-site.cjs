@@ -31,7 +31,11 @@ const PAGES = ["/", "/modules/1", "/modules/1/email-conventions", "/modules/2", 
       }
       const overflow = [...document.querySelectorAll(".pg")].map((s) => {
         const box = s.getBoundingClientRect(); let worst = 0;
-        s.querySelectorAll("*").forEach((k) => { const r = k.getBoundingClientRect(); if (r.height) worst = Math.max(worst, r.bottom - box.bottom, r.right - box.right); });
+        s.querySelectorAll("*").forEach((k) => {
+          // Content clipped by a frame inside the page (overflow: hidden) is not visible overflow.
+          for (let a = k.parentElement; a && a !== s; a = a.parentElement) if (getComputedStyle(a).overflow !== "visible") return;
+          const r = k.getBoundingClientRect(); if (r.height) worst = Math.max(worst, r.bottom - box.bottom, r.right - box.right);
+        });
         return Math.round(worst);
       }).filter((v) => v > 0);
       return {
