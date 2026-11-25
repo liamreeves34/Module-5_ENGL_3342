@@ -4,6 +4,6 @@ Write down who will read the document and what they already know, then define or
 2. Make every part findable
 Readers scan for the part that applies to them. Open each paragraph with its subject, as the department email I analyzed did with one course per paragraph, and put each warning directly before its step.
 3. Prove the problem with people
-“Confusing” persuades no one. “8 of 9 respondents drove to a lot the site showed as open, and it was full” does. Survey or test real users and let the counts carry the recommendation.
+“Confusing” persuades no one. “8 of 9 respondents drove to a lot the site showed as open, and it was full” does. Survey the people who use it and let the counts carry the recommendation.
 4. Own every line AI helps write
 Give AI a clear goal and limits, verify its facts and sources, make sure you can explain each line, and disclose where you used it. What you submit is your responsibility.
