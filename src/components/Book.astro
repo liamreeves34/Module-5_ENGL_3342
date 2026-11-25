@@ -20,6 +20,7 @@ const label = book.kind === "module" ? `${book.code}: ${book.title}` : book.titl
   aria-label={label}
   style={`--ink-on:${book.text}`}
   data-bg={book.cloth}
+  data-id={book.id}
   transition:name={`book-${book.id}`}
 >
   <span class="spine">

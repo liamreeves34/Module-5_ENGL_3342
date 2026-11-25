@@ -4,14 +4,14 @@ import Book from "../components/Book.astro";
 import { shelf, welcomeParas } from "../data/books";
 import { portrait, ledgeTile } from "../lib/pixel";
 
-const HOME_H1 = "Six books from one semester of technical writing";
+const HOME_H1 = "Welcome to my library";
 ---
 
 <Base title="Home" current="home" description="Liam Reeves’s ENGL 3342 technical communication portfolio: four modules, a CS writing style guide, and a professional bio, shelved as six books.">
   <section class="stage" aria-labelledby="shelf-title">
     <div class="now">
       <h1 id="shelf-title" data-home={HOME_H1}>{HOME_H1}</h1>
-      <p class="meta" data-home-meta><b>Modules 1–4</b> · Style Guide · Bio<br />Pick a book to open it</p>
+      <p class="meta" data-home-meta><b>Modules 1–4</b> · Style Guide · Bio</p>
     </div>
     <p class="sr-only" aria-live="polite" data-announce></p>
     <div class="shelf">
@@ -20,7 +20,7 @@ const HOME_H1 = "Six books from one semester of technical writing";
       </div>
       <div class="ledge" aria-hidden="true" style={`background-image:${ledgeTile()}`}></div>
     </div>
-    <p class="hint"><span>Hover a spine to pull it out. Click to open the book.</span><span class="keys"><kbd>Tab</kbd> moves between books</span></p>
+    <p class="hint">Pick any book off the shelf to see what’s inside.</p>
   </section>
 
   <section class="welcome" aria-labelledby="hi">
@@ -36,6 +36,9 @@ const HOME_H1 = "Six books from one semester of technical writing";
 </Base>
 
 <script>
+  import { navigate } from "astro:transitions/client";
+  import { prefetch } from "astro:prefetch";
+
   // Hovering or focusing a book swaps the h1 to that book's title and announces it politely;
   // leaving restores the Home heading.
   function initShelf() {
@@ -45,6 +48,7 @@ const HOME_H1 = "Six books from one semester of technical writing";
     if (!h1 || !meta || !live) return;
     const homeMeta = meta.innerHTML;
     let leaveTimer = 0;
+    let opening = false;
     const show = (a: HTMLAnchorElement) => {
       clearTimeout(leaveTimer);
       if (h1.textContent === a.dataset.title) return;
@@ -53,6 +57,7 @@ const HOME_H1 = "Six books from one semester of technical writing";
       live.textContent = a.dataset.title ?? "";
     };
     const reset = () => {
+      if (opening) return;
       leaveTimer = window.setTimeout(() => {
         h1.textContent = h1.dataset.home ?? "";
         meta.innerHTML = homeMeta;
@@ -63,7 +68,62 @@ const HOME_H1 = "Six books from one semester of technical writing";
       a.addEventListener("focus", () => show(a));
       a.addEventListener("mouseleave", reset);
       a.addEventListener("blur", reset);
+      a.addEventListener("click", (e) => {
+        if (opening || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+        if (matchMedia("(prefers-reduced-motion: reduce)").matches || !document.startViewTransition) return;
+        e.preventDefault();
+        opening = true;
+        prefetch(a.href, { ignoreSlowConnection: true });   // load the next page while the book opens
+        show(a);
+        openBook(a).finally(() => navigate(a.href));
+      });
     });
   }
+
+  // Pluck the book off the shelf and open it: it lifts out, glides to the centre while it
+  // grows, and the cover swings open on its spine in six stepped frames. The open book then
+  // carries the book's view-transition name, so the next page's spread grows out of it.
+  async function openBook(a: HTMLAnchorElement) {
+    const face = a.querySelector<HTMLElement>(".face")!;
+    const cloth = a.dataset.bg ?? "#1F2A1D";
+    const id = a.dataset.id!;
+    const start = (getComputedStyle(face).display === "none" ? a : face).getBoundingClientRect();
+    const W = 256, H = face.offsetHeight || 352;
+
+    const fly = document.createElement("div");
+    fly.className = "fly";
+    fly.style.setProperty("--cloth", cloth);
+    fly.style.setProperty("--ink-on", getComputedStyle(a).getPropertyValue("--ink-on"));
+    fly.style.width = W + "px";
+    fly.style.height = H + "px";
+    fly.setAttribute("aria-hidden", "true");
+    const cover = document.createElement("div");
+    cover.className = "fly-cover";
+    const front = face.cloneNode(true) as HTMLElement;
+    front.className = "fly-front";
+    front.querySelector(".dim")?.remove();
+    cover.append(front, Object.assign(document.createElement("div"), { className: "fly-back" }));
+    fly.append(Object.assign(document.createElement("div"), { className: "fly-page" }), cover);
+    document.body.append(fly);
+
+    // The book leaves a gap on the shelf; only the flying copy carries the transition name.
+    a.style.visibility = "hidden";
+    a.style.viewTransitionName = "none";
+
+    const vw = innerWidth, vh = innerHeight;
+    const scale = Math.min((Math.min(vw - 40, 1072) / 2) / W, (vh * 0.72) / H);
+    const sx = start.left, sy = start.bottom - H;
+    const tx = vw / 2, ty = vh / 2 - (H * scale) / 2;   // spine at the centre: the open book is centred
+    const at = (x: number, y: number, k = 1) => `translate(${x}px, ${y}px) scale(${k})`;
+
+    await fly.animate([{ transform: at(sx, sy) }, { transform: at(sx, sy - 24) }],
+      { duration: 120, easing: "steps(2, end)", fill: "forwards" }).finished;
+    await fly.animate([{ transform: at(sx, sy - 24) }, { transform: at(tx, ty, scale) }],
+      { duration: 340, easing: "cubic-bezier(.22, 1, .36, 1)", fill: "forwards" }).finished;
+    await cover.animate([{ transform: "rotateY(0deg)" }, { transform: "rotateY(-180deg)" }],
+      { duration: 300, easing: "steps(6, end)", fill: "forwards" }).finished;
+    fly.style.viewTransitionName = `book-${id}`;
+  }
+
   document.addEventListener("astro:page-load", initShelf);
 </script>

@@ -108,8 +108,7 @@ main:focus { outline: none; }
 }
 @media (prefers-reduced-motion: no-preference) { .book { transition: transform 120ms steps(2, end); } }
 .ledge { height: 24px; margin-top: -2px; background-repeat: repeat-x; background-size: 40px 24px; image-rendering: pixelated; }
-.hint { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px 28px; padding: 14px 0 0; font-size: 15px; color: var(--ink-2); }
-.hint kbd { font: inherit; font-weight: 700; color: var(--ink); border: 2px solid var(--rule); padding: 0 6px; border-radius: 2px; }
+.hint { padding: 14px 0 0; text-align: center; font-size: 16px; color: var(--ink-2); }
 
 /* ---------- home: welcome ---------- */
 .welcome { display: grid; grid-template-columns: 240px minmax(0, 68ch); gap: 56px; justify-content: center; padding: 72px 48px 96px; }
@@ -223,6 +222,22 @@ main:focus { outline: none; }
   :root::view-transition-new(*.turn) { animation: vt-fade-in 120ms linear both !important; transform: none; }
 }
 
+/* Opening a book from the shelf (see the script in index.astro). The flying book is a copy of
+   the cover over two pages; the cover hinges on its spine (left edge). */
+.fly { position: fixed; left: 0; top: 0; z-index: 40; transform-origin: 0 0; perspective: 1400px; pointer-events: none; filter: drop-shadow(8px 14px 12px rgba(31,42,29,.30)); }
+.fly-page, .fly-back { position: absolute; inset: 0; background: var(--stock); border: 16px solid var(--cloth); }
+.fly-page { border-left-width: 6px; box-shadow: inset 12px 0 0 #E4E0D0; }
+.fly-cover { position: absolute; inset: 0; transform-origin: left center; transform-style: preserve-3d; }
+.fly-front, .fly-back { backface-visibility: hidden; }
+.fly-front { position: absolute; inset: 0; display: block; color: var(--ink-on, #fff); }
+.fly-back { transform: rotateY(180deg); border-right-width: 6px; box-shadow: inset -12px 0 0 #E4E0D0; }
+/* Arriving from the shelf: the spread grows out of the open book, then the reflection page
+   (which has no counterpart on the shelf) fades in once the book has landed. */
+.spread { view-transition-class: book; }
+::view-transition-group(*.book) { animation-duration: 420ms; }
+::view-transition-new(*.turn):only-child { animation: vt-fade-in 220ms 340ms both; transform: none; }
+::view-transition-old(*.turn):only-child { animation: vt-fade-out 160ms both; transform: none; }
+
 /* ---------- below 1100px: pages stack ---------- */
 @media (max-width: 1099px) {
   .spread { filter: none; width: 100%; max-width: 720px; height: auto; }
@@ -266,8 +281,7 @@ main:focus { outline: none; }
   .stage { padding: 24px 0 0; }
   .now { padding: 0 20px; min-height: 0; }
   .now h1 { font-size: 38px; }
-  .hint { padding: 12px 20px 0; justify-content: flex-start; }
-  .hint .keys { display: none; }
+  .hint { padding: 12px 20px 0; text-align: left; }
   .welcome { grid-template-columns: 1fr; gap: 24px; padding: 48px 20px 64px; }
   .welcome h2 { font-size: 32px; }
   .crumbs { padding: 16px 20px 0; flex-direction: column; align-items: flex-start; gap: 10px; }
