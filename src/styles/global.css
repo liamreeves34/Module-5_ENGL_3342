@@ -85,28 +85,30 @@ main:focus { outline: none; }
 .row { display: flex; align-items: flex-end; justify-content: center; gap: var(--cell); position: relative; z-index: 1; padding-top: 40px; }
 .book { position: relative; display: block; text-decoration: none; color: var(--ink-on); filter: drop-shadow(6px 10px 8px var(--shadow)); }
 .book:focus-visible { outline-offset: 4px; }
-.book .spine, .book .face { position: relative; display: block; }
-.book .face { display: none; }
+/* The spine is the book's place on the shelf and its hit area. The face-out cover floats over
+   the shelf (centred on the spine, lifted two cells) without taking any space, so hovering never
+   moves the other books; pointer events pass through it to whatever spine is underneath. */
+.book .spine { position: relative; display: block; }
+.book .face { display: none; position: absolute; left: 50%; bottom: 0; transform: translate(-50%, -16px); z-index: 1; pointer-events: none; }
 .spine-title { position: absolute; left: 0; right: 0; top: calc(var(--cell) * 7.5); bottom: 96px; writing-mode: vertical-rl; display: flex; align-items: center; justify-content: center; font-family: var(--display); font-weight: 700; font-size: 20px; line-height: 1.05; text-align: center; padding: 0 8px; }
 .spine-code { position: absolute; left: 0; right: 0; bottom: 62px; text-align: center; font-family: var(--display); font-weight: 700; font-size: 17px; line-height: 1.1; letter-spacing: .02em; }
 .cover-title { position: absolute; left: 28px; right: 52px; top: calc(var(--cell) * 4); display: flex; flex-direction: column; gap: 8px; }
-.cover-code { font-size: 14px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.cover-code { font-size: 14px; line-height: 1.2; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
 .cover-name { font-family: var(--display); font-weight: 700; font-size: 25px; line-height: 1.05; letter-spacing: -0.005em; text-wrap: balance; }
-.cover-by { position: absolute; left: 28px; bottom: calc(var(--cell) * 2); font-size: 14px; font-weight: 700; letter-spacing: .02em; }
+.cover-by { position: absolute; left: 28px; bottom: calc(var(--cell) * 2); font-size: 14px; line-height: 1; font-weight: 700; letter-spacing: .02em; }
 .dim { position: absolute; left: 0; right: 24px; top: -30px; display: flex; align-items: center; gap: 8px; color: var(--pencil); font-family: var(--display); font-weight: 700; font-size: 14px; letter-spacing: .08em; text-transform: uppercase; white-space: nowrap; }
 .dim i { flex: 1; height: 2px; background: var(--pencil); position: relative; }
 .dim i:first-child::before, .dim i:last-child::after { content: ""; position: absolute; top: -6px; width: 2px; height: 14px; background: var(--pencil); }
 .dim i:first-child::before { left: 0; } .dim i:last-child::after { right: 0; }
 /* Pulled out face-out: a sprite swap (grid law), lifted two cells in whole-cell steps. */
-.book:focus-visible .spine { display: none; }
-.book:focus-visible .face { display: block; }
-.book:focus-visible { transform: translateY(-16px); }
+.book:hover, .book:focus-visible { z-index: 3; }
+.book:focus-visible { outline: none; }
+.book:focus-visible .spine { opacity: 0; }
+.book:focus-visible .face { display: block; outline: 3px solid var(--pencil); outline-offset: 4px; }
 @media (hover: hover) {
-  .book:hover .spine { display: none; }
+  .book:hover .spine { opacity: 0; }
   .book:hover .face { display: block; }
-  .book:hover { transform: translateY(-16px); }
 }
-@media (prefers-reduced-motion: no-preference) { .book { transition: transform 120ms steps(2, end); } }
 .ledge { height: 24px; margin-top: -2px; background-repeat: repeat-x; background-size: 40px 24px; image-rendering: pixelated; }
 .hint { padding: 14px 0 0; text-align: center; font-size: 16px; color: var(--ink-2); }
 
@@ -149,9 +151,12 @@ main:focus { outline: none; }
 .toc a:focus-visible { outline-offset: -3px; }
 .pg .foot { margin-top: auto; padding-top: 14px; font-size: 14px; color: var(--ink-2); line-height: 1.45; }
 .pg .foot b { color: var(--ink); }
-.preview { display: grid; grid-template-columns: 190px 1fr; gap: 20px; align-items: start; }
-.preview img { width: 190px; height: auto; border: 2px solid var(--ink); box-shadow: 4px 6px 8px rgba(31,42,29,.22); background: #fff; }
-.actions { margin-top: auto; padding-top: 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; }
+/* Document preview: the top of the first page, at a size where its text can be read, fading
+   into the page stock as if the document continues below. */
+.preview { position: relative; margin: 0 0 14px; flex: 0 1 216px; min-height: 150px; overflow: hidden; border: 2px solid var(--ink); border-bottom: 0; background: #fff; box-shadow: 4px 6px 10px rgba(31,42,29,.18); }
+.preview img { display: block; width: 100%; height: auto; }
+.preview::after { content: ""; position: absolute; inset: auto 0 0 0; height: 72px; background: linear-gradient(rgba(247,246,238,0), var(--stock)); }
+.actions { margin-top: auto; padding-top: 18px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; }
 .readbtn, .openpdf { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; background: var(--ink); color: var(--ground); font-weight: 700; font-size: 16px; text-decoration: none; padding: 10px 16px; }
 .readbtn:hover, .openpdf:hover { background: var(--pencil); }
 .pdflink { font-weight: 700; font-size: 16px; text-decoration-thickness: 2px; text-decoration-color: rgba(31,42,29,.45); }
@@ -244,9 +249,9 @@ main:focus { outline: none; }
 .fly-spine-art { position: absolute; left: 0; top: 0; display: block; transform-origin: 0 0; }
 .fly-spine-art .spine-title, .fly-spine-art .spine-code { color: inherit; }
 .fly-label { position: absolute; left: calc(28px * var(--k)); right: calc(52px * var(--k)); top: calc(32px * var(--k)); bottom: calc(16px * var(--k)); display: flex; flex-direction: column; gap: calc(8px * var(--k)); }
-.fly-code { font-size: calc(14px * var(--k)); font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.fly-code { font-size: calc(14px * var(--k)); line-height: 1.2; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
 .fly-name { font-family: var(--display); font-weight: 700; font-size: calc(25px * var(--k)); line-height: 1.05; text-wrap: balance; }
-.fly-by { position: absolute; left: 0; bottom: 0; font-size: calc(14px * var(--k)); font-weight: 700; letter-spacing: .02em; }
+.fly-by { position: absolute; left: 0; bottom: 0; font-size: calc(14px * var(--k)); line-height: 1; font-weight: 700; letter-spacing: .02em; }
 .fly-dim { position: absolute; inset: 0; background: #10180f; opacity: 0; pointer-events: none; }
 /* The cover's shadow sweeping over the right page as the cover lifts. */
 .fly-cast { background: linear-gradient(to right, rgba(16,24,15,.45), rgba(16,24,15,0) 70%); }
@@ -311,8 +316,7 @@ main:focus { outline: none; }
   .pg { padding: 22px 20px 26px; }
   .pg h1 { font-size: 30px; margin-bottom: 18px; }
   .pg .body, .pg .lede, .rules p, .bio-body { font-size: 16.5px; }
-  .preview { grid-template-columns: 1fr; }
-  .preview img { width: 70%; }
+  .preview { flex-basis: 180px; }
   .contact dl div { grid-template-columns: 64px 1fr; }
   .reader { padding: 14px 12px 40px; }
   .sheet { border-width: 10px; }

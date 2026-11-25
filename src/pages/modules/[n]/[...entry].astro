@@ -62,10 +62,10 @@ const pp = (n: number) => (n === 1 ? "1 p." : `${n} pp.`);
       {doc ? (
         <>
           <h2>{doc.title}</h2>
-          <div class="preview">
-            <img src={url(doc.preview)} alt={`First page of ${doc.title}`} width="190" height="246" loading="eager" decoding="async" />
-            <div class="body">{doc.summary.map((s) => <p>{s}</p>)}</div>
-          </div>
+          <figure class="preview">
+            <img src={url(doc.preview)} alt={`Top of the first page of ${doc.title}`} width="1100" height="1424" loading="eager" decoding="async" />
+          </figure>
+          <div class="body">{doc.summary.map((s) => <p>{s}</p>)}</div>
           <div class="actions">
             <a class="readbtn" href={url(`${base}/${doc.slug}/read`)}>Read full screen<span class="expand" aria-hidden="true"></span></a>
             <a class="pdflink" href={url(doc.pdf)} target="_blank" rel="noopener">Open PDF<span class="sr-only">: {doc.title}, {pp(doc.pages)} (opens in a new tab)</span></a>

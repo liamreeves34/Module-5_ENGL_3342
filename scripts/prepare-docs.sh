@@ -17,6 +17,6 @@ cp "$S/Module4/AI_Workshop/Module-4_Critical-AI-Literacy_Workshop.pdf"          
 python3 scripts/redact-resume.py "$S/Module4/Resume_and_Cover_Letter/Module-4_Resume_and_Cover_Letter_Liam_Reeves.pdf" public/docs/m4-resume-cover-letter.pdf
 for f in public/docs/*.pdf; do
   n=$(basename "$f" .pdf)
-  pdftoppm -png -singlefile -f 1 -l 1 -scale-to-x 640 -scale-to-y -1 "$f" "public/previews/$n"
+  pdftoppm -png -singlefile -f 1 -l 1 -scale-to-x 1100 -scale-to-y -1 "$f" "public/previews/$n"
 done
 ls -la public/docs public/previews

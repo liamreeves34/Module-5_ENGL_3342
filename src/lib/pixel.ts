@@ -111,6 +111,10 @@ function foreEdge(g: Grid, x: number, H: number, c: string) {
   rect(g, x + 2, 0, 1, H, shade(c, -0.4));              // back board's edge
 }
 
+/** Icon panel size for a cover H cells tall: 20 cells (icon plus 2-cell margin) on full-height
+ *  books, 18 (1-cell margin) on the shorter Guide and Bio books. */
+export const panelFor = (H: number) => (H >= 44 ? { panel: 20, gap: 2 } : { panel: 18, gap: 1 });
+
 export function cover(book: Cloth) {
   const W = T.coverW, H = book.H ?? T.spineH;
   const g = grid(W + 3, H), c = book.cloth;
@@ -121,9 +125,12 @@ export function cover(book: Cloth) {
   rect(g, 0, H - 1, W, 1, shade(c, -0.3));
   foreEdge(g, W, H, c);
   for (let y = 7; y < H - 2; y++) for (let x = 3; x < W - 1; x++) if ((x * 7 + y * 3) % 11 === 0) g[y][x] = shade(c, 0.08);
-  const panelW = 20, panelX = Math.floor((W - panelW) / 2) + 1, panelY = H - 25;
-  rect(g, panelX, panelY, panelW, 20, book.panel);
-  stamp(g, ICONS[book.icon], panelX + 2, panelY + 2, { o: T.inkPixel, a: book.iconA, b: book.iconB, h: "#FFFFFF" });
+  // Shorter books (the Guide and Bio) get a tighter panel so the title above never runs into
+  // it; the panel always ends five cells up, clear of the author line.
+  const { panel, gap } = panelFor(H);
+  const panelX = Math.floor((W - panel) / 2) + 1, panelY = H - panel - 5;
+  rect(g, panelX, panelY, panel, panel, book.panel);
+  stamp(g, ICONS[book.icon], panelX + gap, panelY + gap, { o: T.inkPixel, a: book.iconA, b: book.iconB, h: "#FFFFFF" });
   return svg(g, "px cover-art");
 }
 
@@ -159,7 +166,7 @@ export function spreadHalf(board: string, H: number, side: "left" | "right") {
 
 /** The front cover at open-book size (67 cells by H + 2 rows): the shelf cover's design,
  *  with its hardcover fore-edge on the right and the icon panel at double size. */
-export function bigCover(book: Cloth, Hc: number) {
+export function bigCover(book: Cloth, Hc: number, faceH: number) {
   const Wc = 67, W = Wc - 3;
   const g = grid(Wc, Hc), c = book.cloth;
   rect(g, 0, 0, W, Hc, c);
@@ -169,10 +176,13 @@ export function bigCover(book: Cloth, Hc: number) {
   rect(g, 0, Hc - 1, W, 1, shade(c, -0.3));
   foreEdge(g, W, Hc, c);
   for (let y = 7; y < Hc - 2; y++) for (let x = 3; x < W - 1; x++) if ((x * 7 + y * 3) % 11 === 0) g[y][x] = shade(c, 0.08);
-  const panel = 36, px = Math.floor((W - panel) / 2) + 1, py = Hc - panel - 8;
+  // The shelf cover's layout at k times the size: same panel proportions, same bottom margin.
+  const k = (Hc * 8) / faceH, small = panelFor(faceH / 8);
+  const gap = small.gap * 2, panel = 32 + gap * 2;
+  const px = Math.floor((W - panel) / 2) + 1, py = Hc - panel - Math.round(5 * k);
   rect(g, px, py, panel, panel, book.panel);
   ICONS[book.icon].forEach((row, y) => [...row].forEach((ch, x) => {
-    if (ch !== ".") rect(g, px + 2 + x * 2, py + 2 + y * 2, 2, 2, ({ o: T.inkPixel, a: book.iconA, b: book.iconB, h: "#FFFFFF" } as Record<string, string>)[ch]);
+    if (ch !== ".") rect(g, px + gap + x * 2, py + gap + y * 2, 2, 2, ({ o: T.inkPixel, a: book.iconA, b: book.iconB, h: "#FFFFFF" } as Record<string, string>)[ch]);
   }));
   return svg(g, "px");
 }

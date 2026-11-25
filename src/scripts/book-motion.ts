@@ -64,7 +64,7 @@ function buildFly(art: Art, coverOpen: boolean): Fly {
   const page = div("fly-page", spreadHalf(art.cloth, art.h, "right"));
   page.append(cast);
 
-  const front = div("fly-front", bigCover(art, art.h + 2));
+  const front = div("fly-front", bigCover(art, art.h + 2, art.faceH));
   const label = div("fly-label");
   label.style.cssText = `color:${art.ink};--k:${k}`;
   label.innerHTML = `<span class="fly-code"></span><span class="fly-name"></span><span class="fly-by">Liam Reeves</span>`;
