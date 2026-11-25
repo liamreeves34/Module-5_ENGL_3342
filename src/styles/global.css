@@ -227,16 +227,29 @@ main:focus { outline: none; }
   :root::view-transition-new(*.book) { animation: vt-fade-in 180ms linear both !important; }
 }
 
-/* Opening a book from the shelf (see the script in index.astro). The flying book is a copy of
-   the cover over two pages; the cover hinges on its spine (left edge). Border widths come in
-   as variables so that, at the final scale, the board measures exactly what the spread's does. */
-.fly { position: fixed; left: 0; top: 0; z-index: 40; transform-origin: 0 0; perspective: 1400px; pointer-events: none; will-change: transform; }
-.fly-page, .fly-back { position: absolute; inset: 0; background: var(--stock); border: var(--by) solid var(--cloth); border-width: var(--by) var(--bx); }
-.fly-page { border-left: var(--gx) solid var(--cloth); box-shadow: 10px 16px 18px rgba(31,42,29,.28); }
+/* The flying book (src/scripts/book-motion.ts): a 3D book built at the open spread's size.
+   .fly is the closed book's box (one page wide); the cover hinges on its left edge, the spine
+   face stands perpendicular at that edge, and the pages are the spread's own pixel art. */
+.fly { position: fixed; left: 0; top: 0; z-index: 40; transform-origin: 0 0; transform-style: preserve-3d; pointer-events: none; will-change: transform; }
+.fly .px { width: 100%; height: 100%; }
+.fly-page, .fly-front, .fly-back, .fly-spine { position: absolute; top: 0; height: 100%; overflow: hidden; }
+.fly-page, .fly-front, .fly-back { left: 0; width: 100%; }
+.fly-page { box-shadow: 8px 14px 12px rgba(31,42,29,.30); }
 .fly-cover { position: absolute; inset: 0; transform-origin: left center; transform-style: preserve-3d; will-change: transform; }
-.fly-front, .fly-back { backface-visibility: hidden; }
-.fly-front { position: absolute; inset: 0; display: block; color: var(--ink-on, #fff); box-shadow: 10px 16px 18px rgba(31,42,29,.28); }
-.fly-back { transform: rotateY(180deg); border-right: var(--gx) solid var(--cloth); }
+.fly-front, .fly-back, .fly-spine { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+/* The inside of the cover is the left page; its shadow is clipped at the gutter so it does not
+   fall across the right page. */
+.fly-back { transform: rotateY(180deg); overflow: visible; box-shadow: 8px 14px 12px rgba(31,42,29,.30); clip-path: inset(-40px 0 -40px -40px); }
+.fly-spine { transform-origin: right center; transform: rotateY(-90deg); }
+.fly-spine-art { position: absolute; left: 0; top: 0; display: block; transform-origin: 0 0; }
+.fly-spine-art .spine-title, .fly-spine-art .spine-code { color: inherit; }
+.fly-label { position: absolute; left: calc(28px * var(--k)); right: calc(44px * var(--k)); top: calc(32px * var(--k)); bottom: calc(16px * var(--k)); display: flex; flex-direction: column; gap: calc(8px * var(--k)); }
+.fly-code { font-size: calc(14px * var(--k)); font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.fly-name { font-family: var(--display); font-weight: 700; font-size: calc(25px * var(--k)); line-height: 1.05; text-wrap: balance; }
+.fly-by { position: absolute; left: 0; bottom: 0; font-size: calc(14px * var(--k)); font-weight: 700; letter-spacing: .02em; }
+.fly-dim { position: absolute; inset: 0; background: #10180f; opacity: 0; pointer-events: none; }
+/* The cover's shadow sweeping over the right page as the cover lifts. */
+.fly-cast { background: linear-gradient(to right, rgba(16,24,15,.45), rgba(16,24,15,0) 70%); }
 /* Arriving from the shelf: the spread grows out of the open book, then the reflection page
    (which has no counterpart on the shelf) fades in once the book has landed. */
 .spread, .book, .sheet { view-transition-class: book; }

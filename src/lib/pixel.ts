@@ -117,8 +117,8 @@ export function cover(book: Cloth) {
   return svg(g, "px cover-art");
 }
 
-/** Open-book frame: board in the book's cloth, two page blocks, gutter shading. */
-export function spreadFrame(board: string, H: number) {
+/** Open-book frame grid: board in the book's cloth, two page blocks, gutter shading. */
+function spreadGrid(board: string, H: number): Grid {
   const PW = 64, B = 2, G = 2, W = B + PW + G + PW + B;
   const g = grid(W, H + 3), stock = T.pages;
   rect(g, 0, 0, W, H + 1, board);
@@ -134,7 +134,38 @@ export function spreadFrame(board: string, H: number) {
     rect(g, B + PW + G + (2 - i), B, 1, H - 4, c);
   });
   rect(g, B + PW, 0, G, H + 1, shade(board, -0.35));
-  return svg(g, "px spread-art");
+  return g;
+}
+
+export function spreadFrame(board: string, H: number) {
+  return svg(spreadGrid(board, H), "px spread-art");
+}
+
+/** One half of the open spread (67 cells wide, H + 2 rows), pixel-identical to spreadFrame. */
+export function spreadHalf(board: string, H: number, side: "left" | "right") {
+  const g = spreadGrid(board, H).slice(0, H + 2).map((r) => (side === "left" ? r.slice(0, 67) : r.slice(67)));
+  return svg(g, "px");
+}
+
+/** The front cover at open-book size (67 cells by H + 2 rows): the shelf cover's design,
+ *  with its page block on the right and the icon panel at double size. */
+export function bigCover(book: Cloth, Hc: number) {
+  const Wc = 67, P = 2, W = Wc - P;
+  const g = grid(Wc, Hc), c = book.cloth;
+  rect(g, 0, 0, W, Hc, c);
+  rect(g, 0, 0, 2, Hc, shade(c, -0.25));
+  rect(g, 2, 0, 1, Hc, shade(c, 0.18));
+  rect(g, W - 1, 0, 1, Hc, shade(c, -0.3));
+  rect(g, 0, Hc - 1, W, 1, shade(c, -0.3));
+  rect(g, W, 1, P, Hc - 1, T.pages);
+  for (let y = 2; y < Hc; y += 2) g[y][W + 1] = shade(T.pages, -0.12);
+  for (let y = 7; y < Hc - 2; y++) for (let x = 3; x < W - 1; x++) if ((x * 7 + y * 3) % 11 === 0) g[y][x] = shade(c, 0.08);
+  const panel = 36, px = Math.floor((W - panel) / 2) + 1, py = Hc - panel - 8;
+  rect(g, px, py, panel, panel, book.panel);
+  ICONS[book.icon].forEach((row, y) => [...row].forEach((ch, x) => {
+    if (ch !== ".") rect(g, px + 2 + x * 2, py + 2 + y * 2, 2, 2, ({ o: T.inkPixel, a: book.iconA, b: book.iconB, h: "#FFFFFF" } as Record<string, string>)[ch]);
+  }));
+  return svg(g, "px");
 }
 
 /** Placeholder portrait until Liam supplies a photo or pixel avatar. */

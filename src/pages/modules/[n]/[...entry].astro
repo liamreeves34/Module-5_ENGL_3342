@@ -4,7 +4,7 @@
 // between them is a view transition layered on top.
 import Base from "../../../layouts/Base.astro";
 import Spread from "../../../components/Spread.astro";
-import { modules, type ModuleBook, type Doc } from "../../../data/books";
+import { modules, artOf, type ModuleBook, type Doc } from "../../../data/books";
 import { url } from "../../../lib/url";
 
 export function getStaticPaths() {
@@ -35,6 +35,7 @@ const pp = (n: number) => (n === 1 ? "1 p." : `${n} pp.`);
     leftLabel="Contents"
     rightLabel={doc ? doc.title : "Reflection"}
     turn={`page-${book.id}`}
+    art={artOf(book)}
   >
     <Fragment slot="left">
       <p class="kick">{book.runningHead}</p>

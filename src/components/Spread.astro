@@ -13,10 +13,12 @@ interface Props {
   where: string;
   leftLabel: string;
   rightLabel: string;
+  /** Book art description for the closing animation (artOf). */
+  art: string;
   /** Right page's transition name: entries of one book share it so the page turns. */
   turn?: string;
 }
-const { id, cloth, kick, h, where, leftLabel, rightLabel, turn } = Astro.props;
+const { id, cloth, kick, h, where, leftLabel, rightLabel, turn, art } = Astro.props;
 ---
 
 <div class="crumbs">
@@ -24,7 +26,7 @@ const { id, cloth, kick, h, where, leftLabel, rightLabel, turn } = Astro.props;
   <p class="where"><Fragment set:html={where} /></p>
 </div>
 <div class="spread-wrap">
-  <div class="spread" data-book style={`--cloth:${cloth};--kick:${kick};--spread-h:${h * 8}px`} transition:name={`book-${id}`}>
+  <div class="spread" data-art={art} style={`--cloth:${cloth};--kick:${kick};--spread-h:${h * 8}px`} transition:name={`book-${id}`}>
     <Fragment set:html={spreadFrame(cloth, h)} />
     <section class="pg left" aria-label={leftLabel}>
       <slot name="left" />

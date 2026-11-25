@@ -2,7 +2,7 @@
 // One book on the shelf: a spine at rest, swapped for its face-out cover on hover or focus.
 // Titles are real text over decorative pixel art.
 import { spine, cover } from "../lib/pixel";
-import type { ModuleBook, RefBook } from "../data/books";
+import { artOf, type ModuleBook, type RefBook } from "../data/books";
 import { url } from "../lib/url";
 
 interface Props { book: ModuleBook | RefBook }
@@ -21,7 +21,7 @@ const label = book.kind === "module" ? `${book.code}: ${book.title}` : book.titl
   style={`--ink-on:${book.text}`}
   data-bg={book.cloth}
   data-id={book.id}
-  data-spread-h={book.kind === "module" ? (book.spreadH ?? 78) : book.spreadH}
+  data-art={artOf(book)}
   transition:name={`book-${book.id}`}
 >
   <span class="spine">

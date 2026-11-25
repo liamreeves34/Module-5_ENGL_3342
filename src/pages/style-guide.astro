@@ -3,13 +3,13 @@
 // left page; principles 2-4 on the right.
 import Base from "../layouts/Base.astro";
 import Spread from "../components/Spread.astro";
-import { guide, guideContent } from "../data/books";
+import { guide, guideContent, artOf } from "../data/books";
 const { intro, principles } = guideContent;
 const [first, ...rest] = principles;
 ---
 
 <Base title="Style Guide" current="guide" description="A beginner’s guide to communicating in computer science: four principles drawn from Liam Reeves’s ENGL 3342 work.">
-  <Spread id={guide.id} cloth={guide.cloth} kick={guide.kick} h={guide.spreadH}
+  <Spread id={guide.id} cloth={guide.cloth} kick={guide.kick} h={guide.spreadH} art={artOf(guide)}
     where={`<b>Style Guide</b> · ${principles.length} principles for CS writing`}
     leftLabel="Introduction and principle 1" rightLabel={`Principles 2 to ${principles.length}`}>
     <Fragment slot="left">

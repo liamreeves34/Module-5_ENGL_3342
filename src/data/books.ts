@@ -216,3 +216,11 @@ export const bioContent = (() => {
 export const shelf = [...modules, guide, bio];
 
 export const moduleHref = (m: ModuleBook) => `modules/${m.n}`;
+
+/** What the book-opening animation needs to draw a book (see src/scripts/book-motion.ts). */
+export const artOf = (b: ModuleBook | RefBook) => JSON.stringify({
+  id: b.id, cloth: b.cloth, band: b.band, panel: b.panel, iconA: b.iconA, iconB: b.iconB, icon: b.icon,
+  ink: b.text, code: b.code, short: b.short,
+  h: b.kind === "module" ? (b.spreadH ?? 78) : b.spreadH,
+  faceH: (b.H ?? 44) * 8, spineW: (b.W ?? 11) * 8,
+});

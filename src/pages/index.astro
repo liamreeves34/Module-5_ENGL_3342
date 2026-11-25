@@ -36,10 +36,8 @@ const HOME_H1 = "Four projects, one semester of technical writing";
 </Base>
 
 <script>
-  import { navigate } from "astro:transitions/client";
-
   // Hovering or focusing a book swaps the h1 to that book's title and announces it politely;
-  // leaving restores the Home heading.
+  // leaving restores the Home heading. Opening a book is handled in src/scripts/book-motion.ts.
   function initShelf() {
     const h1 = document.querySelector<HTMLElement>("[data-home]");
     const meta = document.querySelector<HTMLElement>("[data-home-meta]");
@@ -47,7 +45,6 @@ const HOME_H1 = "Four projects, one semester of technical writing";
     if (!h1 || !meta || !live) return;
     const homeMeta = meta.innerHTML;
     let leaveTimer = 0;
-    let opening = false;
     const show = (a: HTMLAnchorElement) => {
       clearTimeout(leaveTimer);
       if (h1.textContent === a.dataset.title) return;
@@ -56,7 +53,7 @@ const HOME_H1 = "Four projects, one semester of technical writing";
       live.textContent = a.dataset.title ?? "";
     };
     const reset = () => {
-      if (opening) return;
+      if (document.documentElement.dataset.bookMotion === "open") return;   // keep the title while it opens
       leaveTimer = window.setTimeout(() => {
         h1.textContent = h1.dataset.home ?? "";
         meta.innerHTML = homeMeta;
@@ -65,90 +62,10 @@ const HOME_H1 = "Four projects, one semester of technical writing";
     document.querySelectorAll<HTMLAnchorElement>(".book").forEach((a) => {
       a.addEventListener("mouseenter", () => show(a));
       a.addEventListener("focus", () => show(a));
+      a.addEventListener("click", () => show(a));
       a.addEventListener("mouseleave", reset);
       a.addEventListener("blur", reset);
-      a.addEventListener("click", (e) => {
-        if (opening || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-        if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-        e.preventDefault();
-        opening = true;
-        show(a);
-        // Start loading the next page now; the router waits for the book to finish opening
-        // before it swaps the page in (see astro:before-preparation below).
-        pendingOpen = openBook(a).catch(() => {});
-        snapNext = true;
-        navigate(a.href);
-      });
     });
   }
-
-  // Pluck the book off the shelf and open it where the next page's spread will be, so the
-  // page can then appear in place with no in-between blend: the book lifts out, glides to the
-  // spread's position while it grows, swings its cover open, and settles to the spread's exact
-  // frame. Everything animates transform only, so it stays on the compositor.
-  let snapNext = false;
-  let pendingOpen: Promise<void> | null = null;
-  async function openBook(a: HTMLAnchorElement) {
-    const face = a.querySelector<HTMLElement>(".face")!;
-    const start = (getComputedStyle(face).display === "none" ? a : face).getBoundingClientRect();
-    const W = 256, H = face.offsetHeight || 352;          // closed cover, CSS px
-    const vw = document.documentElement.clientWidth, vh = innerHeight;
-    const header = document.querySelector<HTMLElement>(".top")?.offsetHeight ?? 88;
-
-    // Where the spread lands on the next page (see .crumbs and .spread-wrap): it sits below
-    // the header, the crumbs row (22px padding plus the 46px back button) and 26px of padding; it is
-    // 1072px wide and its board is (cells + 2) * 8px tall. Below 1100px the pages stack, so
-    // the book just opens centred and the page appears.
-    const wide = vw >= 1100;
-    const boardH = (Number(a.dataset.spreadH) + 2) * 8;
-    const top = wide ? header + 94 : Math.max(header + 24, vh / 2 - (H * Math.min(1, (vw - 40) / (2 * W))) / 2);
-    const sy = wide ? boardH / H : Math.min(1, (vw - 40) / (2 * W));
-    const sx = wide ? 536 / W : sy;                       // half the spread per page
-    const hinge = vw / 2;
-
-    const fly = document.createElement("div");
-    fly.className = "fly";
-    fly.setAttribute("aria-hidden", "true");
-    fly.style.cssText = `width:${W}px;height:${H}px;--cloth:${a.dataset.bg};--ink-on:${getComputedStyle(a).getPropertyValue("--ink-on")};` +
-      `--bx:${16 / sx}px;--by:${16 / sy}px;--gx:${8 / sx}px`;   // board borders land at exactly 16px / 8px
-    const cover = document.createElement("div");
-    cover.className = "fly-cover";
-    const front = face.cloneNode(true) as HTMLElement;
-    front.className = "fly-front";
-    front.querySelector(".dim")?.remove();
-    cover.append(front, Object.assign(document.createElement("div"), { className: "fly-back" }));
-    fly.append(Object.assign(document.createElement("div"), { className: "fly-page" }), cover);
-    document.body.append(fly);
-    a.style.visibility = "hidden";                        // the book leaves a gap on the shelf
-
-    const at = (x: number, y: number, kx: number, ky = kx) => `translate(${x}px, ${y}px) scale(${kx}, ${ky})`;
-    const sx0 = start.left, sy0 = start.bottom - H;
-    const anim = (el: Element, k: Keyframe[], o: KeyframeAnimationOptions) => el.animate(k, { fill: "forwards", ...o }).finished;
-
-    await anim(fly, [{ transform: at(sx0, sy0, 1) }, { transform: at(sx0, sy0 - 16, 1) }], { duration: 70, easing: "ease-out" });
-    await anim(fly, [{ transform: at(sx0, sy0 - 16, 1) }, { transform: at(hinge, top, sy) }], { duration: 300, easing: "cubic-bezier(.3, .7, .2, 1)" });
-    await anim(cover, [{ transform: "rotateY(0deg)" }, { transform: "rotateY(-180deg)" }], { duration: 260, easing: "cubic-bezier(.45, 0, .25, 1)" });
-    if (wide) await anim(fly, [{ transform: at(hinge, top, sy) }, { transform: at(hinge, top, sx, sy) }], { duration: 110, easing: "ease-out" });
-    else await anim(fly, [{ opacity: 1 }, { opacity: 0 }], { duration: 120, easing: "linear" });
-  }
-
-  document.addEventListener("astro:before-preparation", (e) => {
-    if (!pendingOpen) return;
-    const ev = e as Event & { loader: () => Promise<void> };
-    const load = ev.loader, wait = pendingOpen;
-    pendingOpen = null;
-    ev.loader = async () => { await Promise.all([load(), wait]); };
-  });
-
-  // The open book already sits where the spread will be, so the next page appears in place:
-  // skip the router's blend for this one navigation.
-  document.addEventListener("astro:before-swap", (e) => {
-    if (!snapNext) return;
-    snapNext = false;
-    const vt = (e as Event & { viewTransition?: ViewTransition }).viewTransition;
-    vt?.ready.catch(() => {});        // skipping rejects "ready"; that is expected here
-    vt?.skipTransition();
-  });
-
   document.addEventListener("astro:page-load", initShelf);
 </script>

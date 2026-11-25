@@ -62,6 +62,7 @@ const onModule = typeof current === "number";
       <p>Liam Reeves · Department of Computer Science, University of Texas Rio Grande Valley · ENGL 3342, Fall 2026</p>
     </footer>
     <script>
+      import "../scripts/book-motion";
       // Small enhancements only; every page works without them.
       function setup() {
         document.documentElement.classList.add("js");
@@ -90,6 +91,10 @@ const onModule = typeof current === "number";
         document.querySelector<HTMLAnchorElement>("a[data-esc]")?.click();
       });
       document.addEventListener("astro:page-load", setup);
+      // The router replaces <html>'s attributes on every swap; restore the "js" marker in the
+      // same frame so phones never flash the no-JS layout (expanded menu) between pages.
+      document.documentElement.classList.add("js");
+      document.addEventListener("astro:after-swap", () => document.documentElement.classList.add("js"));
     </script>
   </body>
 </html>
