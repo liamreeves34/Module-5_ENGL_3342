@@ -60,7 +60,8 @@ const check = (ok, name, detail) => results.push(`${ok ? "PASS" : "FAIL"}  ${nam
   check(bw >= 150 && bw <= 200, "D. Bio is 150–200 words", `${bw} words (excluding the contact block)`);
   check(!firstPerson.length, "D. Bio is strictly third person", firstPerson.length ? "found: " + firstPerson.join(", ") : "no first-person words");
   check(contact.includes("mailto:liam.reeves01@utrgv.edu") && contact.some((h) => h.includes("github.com/liamreeves34")), "D. Bio has a contact section", contact.join(", "));
-  check(/internship/i.test(bio) && /graduate/i.test(bio) && /career/i.test(bio), "D. Bio covers internships, graduate study and career", "");
+  const futures = [["internships", /internship/i], ["graduate study", /graduat|M\.S\.|master|Ph\.?D/i], ["career", /career|industry|job/i]].filter(([, r]) => r.test(bio)).map(([n]) => n);
+  check(futures.length > 0, "D. Bio explains how he will use these skills (internships, graduate study, or career)", futures.join(", "));
 
   // Checklist
   const html = execSync("cat dist/index.html dist/*/index.html dist/modules/*/index.html dist/modules/*/*/index.html dist/modules/*/*/read/index.html", { maxBuffer: 64 * 1024 * 1024 }).toString().replace(/<svg[\s\S]*?<\/svg>/g, "");

@@ -16,15 +16,14 @@ import { bio, bioContent, artOf } from "../data/books";
     </Fragment>
     <Fragment slot="right">
       <p class="kick">Future application</p>
-      <h2>{bioContent.nextHead}</h2>
-      <div class="bio-body"><p>{bioContent.next}</p></div>
-      <div class="contact">
-        <h3>Contact</h3>
-        <dl>
-          <div><dt>Email</dt><dd><a href="mailto:liam.reeves01@utrgv.edu">liam.reeves01@utrgv.edu</a></dd></div>
-          <div><dt>GitHub</dt><dd><a href="https://github.com/liamreeves34">github.com/liamreeves34</a></dd></div>
-        </dl>
-      </div>
+      {bioContent.nextHead && <h2>{bioContent.nextHead}</h2>}
+      <div class="bio-body">{bioContent.next.map((p) => <p>{p}</p>)}</div>
+      {bioContent.contact && (
+        <div class="contact">
+          <h3>{bioContent.contact.heading ?? "Contact"}</h3>
+          <dl>{bioContent.contact.items.map((i) => <div><dt>{i.label}</dt><dd><a href={i.href}>{i.text}</a></dd></div>)}</dl>
+        </div>
+      )}
     </Fragment>
   </Spread>
 </Base>

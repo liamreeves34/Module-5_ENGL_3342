@@ -1,7 +1,7 @@
 ---
 import Base from "../layouts/Base.astro";
 import Book from "../components/Book.astro";
-import { shelf, welcomeParas } from "../data/books";
+import { shelf, welcomeBlocks } from "../data/books";
 import { ledgeTile } from "../lib/pixel";
 import { url } from "../lib/url";
 
@@ -30,7 +30,14 @@ const HOME_H1 = "Four projects, one semester of technical writing";
     </figure>
     <div class="welcome-text">
       <h2 id="hi">Welcome to my library.</h2>
-      {welcomeParas.map((p) => <p>{p}</p>)}
+      {welcomeBlocks.map((b) =>
+        b.kind === "p" ? <p>{b.text}</p> :
+        b.kind === "h" ? <h3>{b.text}</h3> :
+        <div class="contact">
+          {b.heading && <h3>{b.heading}</h3>}
+          <dl>{b.items.map((i) => <div><dt>{i.label}</dt><dd><a href={i.href}>{i.text}</a></dd></div>)}</dl>
+        </div>
+      )}
     </div>
   </section>
 </Base>

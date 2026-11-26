@@ -12,7 +12,34 @@ import type { Cloth } from "../lib/pixel";
 /** Split a draft into paragraphs (one per non-empty line). */
 export const paras = (t: string) => t.split("\n").map((l) => l.trim()).filter(Boolean);
 
-export const welcomeParas = paras(welcome);
+/** A draft read as blocks, so the layout follows how Liam writes it: a short line with no final
+ *  period is a heading, "Email:" / "GitHub:" lines become contact links (a "Contact" heading just
+ *  before them heads that list), and everything else is a paragraph. */
+export type Block =
+  | { kind: "p" | "h"; text: string }
+  | { kind: "contact"; heading?: string; items: { label: string; text: string; href: string }[] };
+const contactLine = /^(email|github)\s*:\s*(.+)$/i;
+export function blocks(t: string): Block[] {
+  const out: Block[] = [];
+  for (const line of paras(t)) {
+    const c = line.match(contactLine);
+    if (c) {
+      const label = c[1][0].toUpperCase() + c[1].slice(1).toLowerCase();
+      const text = c[2].trim();
+      const href = /^email$/i.test(c[1]) ? `mailto:${text}` : `https://${text.replace(/^https?:\/\//, "")}`;
+      const last = out[out.length - 1];
+      if (last?.kind === "contact") last.items.push({ label: label === "Github" ? "GitHub" : label, text, href });
+      else {
+        const heading = last?.kind === "h" && /^contact$/i.test(last.text) ? (out.pop() as { text: string }).text : undefined;
+        out.push({ kind: "contact", heading, items: [{ label: label === "Github" ? "GitHub" : label, text, href }] });
+      }
+    } else if (line.split(/\s+/).length <= 8 && !/[.,;:]$/.test(line)) out.push({ kind: "h", text: line });
+    else out.push({ kind: "p", text: line });
+  }
+  return out;
+}
+
+export const welcomeBlocks = blocks(welcome);
 
 export interface Doc {
   slug: string;
@@ -61,6 +88,7 @@ export const modules: ModuleBook[] = [
     cloth: "#2449A6", band: "#F2C14E", panel: "#DDE5F6", iconA: "#F2C14E", iconB: "#2449A6", text: "#FFFFFF", icon: "mail", kick: "#2449A6",
     foot: ["Audience", "Dr. Paudel, and the CS students and faculty who read department email."],
     reflection: paras(m1r),
+    spreadH: 84,
     docs: [
       doc("email-conventions", {
         title: "Email Conventions in Computer Science", sub: "Rhetorical analysis, professional email, redacted sample", pages: 7,
@@ -217,9 +245,20 @@ export const guideContent = (() => {
 })();
 
 /** Bio draft: bio paragraph, "next" heading, "next" paragraph, then a Contact block. */
+/** Bio draft: the first paragraph is the bio (left page); the paragraphs after it are the future
+ *  plans (right page), under a heading if the draft has one; the contact list comes from the
+ *  draft's Email/GitHub lines. */
 export const bioContent = (() => {
-  const p = paras(bioTxt);
-  return { bio: p[0], nextHead: p[1], next: p[2] };
+  const b = blocks(bioTxt);
+  const firstP = b.findIndex((x) => x.kind === "p");
+  const rest = b.slice(firstP + 1);
+  const head = rest.find((x, i) => x.kind === "h" && rest.slice(0, i).every((y) => y.kind === "h"));
+  return {
+    bio: (b[firstP] as { text: string }).text,
+    nextHead: head ? (head as { text: string }).text : undefined,
+    next: rest.filter((x) => x.kind === "p").map((x) => (x as { text: string }).text),
+    contact: b.find((x) => x.kind === "contact") as Extract<Block, { kind: "contact" }> | undefined,
+  };
 })();
 
 export const shelf = [...modules, guide, bio];
