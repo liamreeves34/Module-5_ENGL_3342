@@ -2,7 +2,6 @@
 // Ported from the approved mockup renderer (.impeccable/mocks/flow/src/mock.js), but it draws
 // static SVG at build time instead of canvas at runtime, so the art shows with JavaScript off.
 // Grid law: every pixel is one 8px cell; nothing sits off the grid.
-import avatar from "../data/avatar.json";
 
 export const CELL = 8;
 type Grid = (string | null)[][];
@@ -188,12 +187,12 @@ export function bigCover(book: Cloth, Hc: number, faceH: number) {
   return svg(g, "px");
 }
 
-/** Liam's pixel avatar (drawn by scripts/make-avatar.py from his photo) in a one-cell ink frame. */
+/** Placeholder portrait until Liam supplies a photo or pixel avatar. */
 export function portrait() {
-  const { palette, rows } = avatar as { palette: Record<string, string>; rows: string[] };
-  const n = rows.length + 2, g = grid(n, n);
+  const n = 30, g = grid(n, n);
   rect(g, 0, 0, n, n, "#1F2A1D");
-  rows.forEach((row, y) => [...row].forEach((ch, x) => rect(g, x + 1, y + 1, 1, 1, palette[ch])));
+  rect(g, 1, 1, n - 2, n - 2, "#E1EAD3");
+  stamp(g, ICONS.person, 7, 7, { o: "#1F2A1D", a: "#9DB585", b: "#9DB585", h: "#E1EAD3" });
   return svg(g, "px portrait-art");
 }
 

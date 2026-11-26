@@ -37,5 +37,5 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
 
 ## Unresolved
 
-- Resolved: pixel avatar from Liam's photo (32 x 32 cells in a one-cell ink frame).
+- Liam's photo or pixel avatar (placeholder for now).
 - Copy drafts await Liam's revision.
