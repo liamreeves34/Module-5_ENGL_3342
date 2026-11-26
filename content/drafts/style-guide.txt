@@ -1,5 +1,5 @@
-Four habits for beginners writing about computer science for clients, users, or the public. Each one came out of a fix in this semester’s work.
-1. Name your reader before step one
+Four habits for beginners writing about computer science for clients, users, or the public. Each one was derived from the work done this semester.
+1. Define your audience before any writing
 Write down who will read the document and what they already know, then define or cut every term they don’t. When my manual’s audience changed from scikit-learn users to PyTorch users, I sent a memo revising the prerequisites.
 2. Make every part findable
 Readers scan for the part that applies to them. Open each paragraph with its subject, as the department email I analyzed did with one course per paragraph, and put each warning directly before its step.
