@@ -1,6 +1,8 @@
 ---
-// One book on the shelf: a spine at rest, swapped for its face-out cover on hover or focus.
-// Titles are real text over decorative pixel art.
+// One book on the shelf, built as a 3D box: the spine faces the reader and the front cover is
+// its right-hand side. On hover or focus the box turns a quarter-turn and comes forward so the
+// cover faces out. The anchor's own box (the spine's slot) never moves; the 3D model floats over
+// it without catching the pointer. Titles are real text over decorative pixel art.
 import { spine, cover } from "../lib/pixel";
 import { artOf, type ModuleBook, type RefBook } from "../data/books";
 import { url } from "../lib/url";
@@ -10,6 +12,7 @@ const { book } = Astro.props;
 const href = book.kind === "module" ? url(`modules/${book.n}`) : url(book.href);
 const entries = book.kind === "module" ? `${book.docs.length + 1} entries` : book.kind === "guide" ? "4 principles" : "Bio · Contact";
 const label = book.kind === "module" ? `${book.code}: ${book.title}` : book.title;
+const sw = (book.W ?? 11) * 8, bh = (book.H ?? 44) * 8, cw = 33 * 8;   // spine width, height, cover width
 ---
 
 <a
@@ -18,12 +21,13 @@ const label = book.kind === "module" ? `${book.code}: ${book.title}` : book.titl
   data-title={book.title}
   data-meta={book.kind === "module" ? `${book.code} · ${entries}` : entries}
   aria-label={label}
-  style={`--ink-on:${book.text}`}
+  style={`--ink-on:${book.text};--sw:${sw}px;--bh:${bh}px;--cw:${cw}px`}
   data-bg={book.cloth}
   data-id={book.id}
   data-art={artOf(book)}
   transition:name={`book-${book.id}`}
 >
+  <span class="model">
   <span class="spine">
     <Fragment set:html={spine(book)} />
     <span class="spine-title">{book.short}</span>
@@ -33,5 +37,6 @@ const label = book.kind === "module" ? `${book.code}: ${book.title}` : book.titl
     <Fragment set:html={cover(book)} />
     <span class="cover-title"><span class="cover-code">{book.code}</span><span class="cover-name">{book.short}</span></span>
     <span class="cover-by">Liam Reeves</span>
+  </span>
   </span>
 </a>

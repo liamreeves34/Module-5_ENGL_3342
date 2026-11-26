@@ -85,13 +85,24 @@ main:focus { outline: none; }
 .row { display: flex; align-items: flex-end; justify-content: center; gap: var(--cell); position: relative; z-index: 1; padding-top: 40px; }
 .book { position: relative; display: block; text-decoration: none; color: var(--ink-on); filter: drop-shadow(6px 10px 8px var(--shadow)); }
 .book:focus-visible { outline-offset: 4px; }
-/* The spine is the book's place on the shelf and its hit area; nothing about hovering changes
-   the layout, so the other books never move. On hover the spine slides up out of the shelf while
-   the face-out cover swings round to face the reader (the same motion that starts the opening
-   animation); leaving reverses it. The cover floats over the shelf, centred on its spine, and
-   pointer events pass through it to whatever spine is underneath. */
-.book .spine { position: relative; display: block; }
-.book .face { display: none; position: absolute; left: 50%; bottom: 0; transform: translate(-50%, -16px); z-index: 1; pointer-events: none; }
+/* Each book is a 3D box (see Book.astro): .book is the spine-sized slot and the hit area, and
+   never moves; .model holds the spine face (front) and the cover face (its right side, turned
+   90deg). On hover the model turns -90deg about the box's centre and comes forward, so the cover
+   faces out centred on the slot, lifted two cells. Faces shade as they turn away. */
+.book { width: var(--sw); height: var(--bh); }
+.book .model { position: absolute; left: 0; bottom: 0; width: var(--sw); height: var(--bh); pointer-events: none;
+  transform-style: preserve-3d; transform-origin: calc(var(--sw) / 2) 50% calc(var(--cw) / -2);
+  transform: perspective(1600px) translateY(0) translateZ(0) rotateY(0deg); }
+.book .spine, .book .face { position: absolute; top: 0; height: var(--bh); display: block; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.book .spine { left: 0; width: var(--sw); }
+.book .face { left: var(--sw); width: var(--cw); transform-origin: left center; transform: rotateY(90deg); }
+.book .spine::after, .book .face::after { content: ""; position: absolute; inset: 0; background: #10180f; pointer-events: none; }
+.book .spine::after { opacity: 0; }
+.book .face::after { opacity: .45; }
+.book:hover .model, .book:focus-visible .model {
+  transform: perspective(1600px) translateY(-16px) translateZ(calc((var(--cw) - var(--sw)) / 2)) rotateY(-90deg); }
+.book:hover .spine::after, .book:focus-visible .spine::after { opacity: .45; }
+.book:hover .face::after, .book:focus-visible .face::after { opacity: 0; }
 .spine-title { position: absolute; left: 0; right: 0; top: calc(var(--cell) * 7.5); bottom: 96px; writing-mode: vertical-rl; display: flex; align-items: center; justify-content: center; font-family: var(--display); font-weight: 700; font-size: 20px; line-height: 1.05; text-align: center; padding: 0 8px; }
 .spine-code { position: absolute; left: 0; right: 0; bottom: 62px; text-align: center; font-family: var(--display); font-weight: 700; font-size: 17px; line-height: 1.1; letter-spacing: .02em; }
 .cover-title { position: absolute; left: 28px; right: 52px; top: calc(var(--cell) * 4); display: flex; flex-direction: column; gap: 8px; }
@@ -99,27 +110,13 @@ main:focus { outline: none; }
 .cover-name { font-family: var(--display); font-weight: 700; font-size: 25px; line-height: 1.05; letter-spacing: -0.005em; text-wrap: balance; }
 .cover-by { position: absolute; left: 28px; bottom: calc(var(--cell) * 2); font-size: 14px; line-height: 1; font-weight: 700; letter-spacing: .02em; }
 .book:focus-visible { outline: none; }
-.book:focus-visible .face { display: block; outline: 3px solid var(--pencil); outline-offset: 4px; }
-.book:focus-visible .spine { opacity: 0; }
-@media (hover: hover) {
-  .book { transition: z-index 0s 240ms; }
-  .book:hover, .book:focus-visible { z-index: 3; transition: none; }
-  .book .spine { transition: transform 240ms cubic-bezier(.2, .8, .2, 1), opacity 150ms ease-out; }
-  .book .face {
-    display: block; visibility: hidden; opacity: 0;
-    transform-origin: 50% 100%;
-    transform: translate(-50%, 0) perspective(1200px) rotateY(72deg);
-    transition: transform 240ms cubic-bezier(.2, .8, .2, 1), opacity 100ms ease-out 140ms, visibility 0s 240ms;
-  }
-  .book:hover .spine, .book:focus-visible .spine { opacity: 0; transform: translateY(-16px); }
-  .book:hover .face, .book:focus-visible .face {
-    visibility: visible; opacity: 1;
-    transform: translate(-50%, -16px) perspective(1200px) rotateY(0deg);
-    transition: transform 240ms cubic-bezier(.2, .8, .2, 1), opacity 90ms ease-out, visibility 0s;
-  }
-}
-@media (hover: hover) and (prefers-reduced-motion: reduce) {
-  .book, .book .spine, .book .face { transition: none; }
+.book:focus-visible .face { outline: 3px solid var(--pencil); outline-offset: 4px; }
+.book:hover, .book:focus-visible { z-index: 3; }
+@media (prefers-reduced-motion: no-preference) {
+  .book { transition: z-index 0s 300ms; }
+  .book:hover, .book:focus-visible { transition: none; }
+  .book .model { transition: transform 300ms cubic-bezier(.25, .8, .25, 1); }
+  .book .spine::after, .book .face::after { transition: opacity 300ms cubic-bezier(.25, .8, .25, 1); }
 }
 .ledge { height: 24px; margin-top: -2px; background-repeat: repeat-x; background-size: 40px 24px; image-rendering: pixelated; }
 .hint { padding: 14px 0 0; text-align: center; font-size: 16px; color: var(--ink-2); }
