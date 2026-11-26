@@ -24,7 +24,7 @@ Start here in a new Claude Code session. Read these first (and `.impeccable/DECI
 - Copy is read live from `content/drafts/*.txt` (via `src/data/books.ts`); the drafts are placeholders Liam revises once the site is up.
 - PDFs and first-page previews come from `scripts/prepare-docs.sh`; the resume is published with the phone number removed from the PDF content stream (`scripts/redact-resume.py`).
 - QA: `npm run build && npx astro preview`, then `node scripts/check-site.cjs http://localhost:4321` (sideways scroll, page overflow, WCAG AA contrast, alt text, internal links at 390/820/1024/1440).
-- Still owed: the finish review by a fresh reviewer agent, then DESIGN.md; Liam's photo; copy revision.
+- Still owed: the finish review by a fresh reviewer agent, then DESIGN.md; copy revision. The Home avatar is done (pixel art from Liam's photo, scripts/make-avatar.py).
 
 ## Next steps (from the design phase)
 
@@ -35,4 +35,4 @@ Start here in a new Claude Code session. Read these first (and `.impeccable/DECI
 
 ## Open
 
-- Liam's photo or pixel avatar (placeholder for now).
+- Resolved Nov 26: Home uses a pixel avatar drawn from Liam's photo.

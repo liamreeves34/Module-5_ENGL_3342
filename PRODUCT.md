@@ -88,7 +88,7 @@ Real submissions in `Tech-com-site/`:
 
 Collaborators must be credited where their work appears. The resume PDF includes a personal phone number, which must **not** appear anywhere on the site (confirmed by Liam), so publish a redacted copy of the resume. Contact section: email link to `liam.reeves01@utrgv.edu` and GitHub (`github.com/liamreeves34`), both confirmed. LinkedIn was not included.
 
-Absent, and must not be invented: a photo/avatar, testimonials, grades or instructor feedback, and final reflection text.
+Absent, and must not be invented: testimonials, grades or instructor feedback, and final reflection text. The Home image is a pixel avatar drawn from Liam's photo (Nov 26, 2026, scripts/make-avatar.py); the photo itself is not stored in the repository.
 
 ## Product Principles
 

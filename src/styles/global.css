@@ -127,7 +127,7 @@ main:focus { outline: none; }
 .hint { padding: 14px 0 0; text-align: center; font-size: 16px; color: var(--ink-2); }
 
 /* ---------- home: welcome ---------- */
-.welcome { display: grid; grid-template-columns: 240px minmax(0, 74ch); gap: 56px; justify-content: center; padding: 72px 48px 96px; }
+.welcome { display: grid; grid-template-columns: 272px minmax(0, 74ch); gap: 56px; justify-content: center; padding: 72px 48px 96px; }
 .welcome h2 { font-family: var(--display); font-weight: 700; font-size: 40px; line-height: 1.05; letter-spacing: -0.015em; margin-bottom: 20px; }
 .welcome-text { background: var(--stock); border: 2px solid var(--ink); padding: 36px 44px 40px; box-shadow: 6px 10px 14px rgba(31,42,29,.16); }
 .welcome-text p + p { margin-top: 1em; }
