@@ -27,6 +27,26 @@ const onModule = typeof current === "number";
     <link rel="preload" href={url("fonts/barlow-semi-condensed-700-latin.woff2")} as="font" type="font/woff2" crossorigin />
     <meta name="theme-color" content="#EEF3E4" />
     <ClientRouter />
+    <script is:inline>
+      // Size the open-book spread to the screen (wide screens only). The spread is drawn at
+      // 1072px; it grows in steps of 1/8 so each 8px pixel-art cell stays a whole number of
+      // screen pixels, up to 1.5x, as large as fits below the header. Shared with the book
+      // animation (src/scripts/book-motion.ts) so a book lands at exactly this size.
+      window.__spreadZoom = function (cells) {
+        var vw = document.documentElement.clientWidth, vh = window.innerHeight;
+        if (vw < 1100) return 1;
+        var top = document.querySelector(".top");
+        var header = top ? top.offsetHeight : 88;
+        var fit = Math.min((vw - 96) / 1072, (vh - header - 94 - 40) / ((cells + 3) * 8));
+        return Math.max(1, Math.min(1.5, Math.floor(fit * 8) / 8));
+      };
+      window.__fitSpreads = function () {
+        document.querySelectorAll(".spread[data-art]").forEach(function (el) {
+          var s = window.__spreadZoom(JSON.parse(el.dataset.art).h);
+          el.style.zoom = s === 1 ? "" : String(s);
+        });
+      };
+    </script>
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>

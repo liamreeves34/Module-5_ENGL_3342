@@ -30,6 +30,11 @@ const PERSPECTIVE = 3200;
 const EASE_GLIDE = "cubic-bezier(.45, .05, .2, 1)";
 const EASE_SWING = "cubic-bezier(.45, 0, .25, 1)";
 const reduced = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
+/** The spread's on-screen scale (set up in Base.astro), so a book lands at exactly that size. */
+const spreadZoom = (cells: number): number => (window as unknown as { __spreadZoom?: (c: number) => number }).__spreadZoom?.(cells) ?? 1;
+const fitSpreads = () => (window as unknown as { __fitSpreads?: () => void }).__fitSpreads?.();
+let resizeTimer = 0;
+addEventListener("resize", () => { clearTimeout(resizeTimer); resizeTimer = window.setTimeout(fitSpreads, 100); });
 const home = () => new URL(import.meta.env.BASE_URL, location.origin).pathname;
 
 /** Pivot (cover's top-left, on the spine) at (x, y), uniform scale s, turned deg about the spine. */
@@ -122,7 +127,7 @@ function swing(f: Fly, open: boolean, duration: number) {
 function spreadSpot(art: Art) {
   const vw = document.documentElement.clientWidth, vh = innerHeight;
   const header = document.querySelector<HTMLElement>(".top")?.offsetHeight ?? 88;
-  if (vw >= 1100) return { x: vw / 2, y: header + 94, s: 1, wide: true };
+  if (vw >= 1100) return { x: vw / 2, y: header + 94, s: spreadZoom(art.h), wide: true };
   const H = (art.h + 2) * 8, s = Math.min(1, (vw - 40) / (2 * W));
   return { x: vw / 2, y: Math.max(header + 24, (vh - H * s) / 2), s, wide: false };
 }
@@ -203,8 +208,9 @@ async function closeBook(open: HTMLElement) {
   if (wide) {
     // Lay the open book exactly over the spread; fading it in fades the text off the pages.
     const r = spreadArt!.getBoundingClientRect();
-    at = { x: r.left + W, y: r.top, s: 1 };
-    f.el.style.transform = pose(at.x, at.y, 1, 0);
+    const s = r.width / (2 * W);           // the spread may be enlarged on wide screens
+    at = { x: r.left + W * s, y: r.top, s };
+    f.el.style.transform = pose(at.x, at.y, s, 0);
     await fadeIn(f.el, ms(120));
     open.style.visibility = "hidden";     // the book now stands in for it; nothing shows through
     await swing(f, false, ms(280));
@@ -321,6 +327,7 @@ document.addEventListener("astro:before-swap", (e) => {
 
 // The swap replaces <body>; carry a closing book across and hide its empty slot meanwhile.
 document.addEventListener("astro:after-swap", () => {
+  fitSpreads();                               // size the new page's spread before it paints
   if (!closing) return;
   document.body.append(closing.fly.el);
   const id = closing.fly.art.id;
