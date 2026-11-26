@@ -83,7 +83,7 @@ main:focus { outline: none; }
 .now .meta b { color: var(--ink); font-weight: 700; }
 .shelf { position: relative; margin-top: 28px; }
 .row { display: flex; align-items: flex-end; justify-content: center; gap: var(--cell); position: relative; z-index: 1; padding-top: 40px; }
-.book { position: relative; display: block; text-decoration: none; color: var(--ink-on); filter: drop-shadow(6px 10px 8px var(--shadow)); }
+.book { position: relative; display: block; text-decoration: none; color: var(--ink-on); }
 .book:focus-visible { outline-offset: 4px; }
 /* Each book is a 3D box (see Book.astro): .book is the spine-sized slot and the hit area, and
    never moves; .model holds the spine face (front) and the cover face (its right side, turned
@@ -91,16 +91,18 @@ main:focus { outline: none; }
    faces out centred on the slot, lifted two cells. Faces shade as they turn away. */
 .book { width: var(--sw); height: var(--bh); }
 .book .model { position: absolute; left: 0; bottom: 0; width: var(--sw); height: var(--bh); pointer-events: none;
-  transform-style: preserve-3d; transform-origin: calc(var(--sw) / 2) 50% calc(var(--cw) / -2);
-  transform: perspective(1600px) translateY(0) translateZ(0) rotateY(0deg); }
+  transform-style: preserve-3d; transform-origin: calc(var(--sw) / 2) 50% 0;
+  /* Turn about the box's centre (half a cover-width behind the spine). At rest this is the
+     identity, so a shelved book is drawn at exactly its slot's size, on the pixel grid. */
+  transform: perspective(1600px) translateY(0) translateZ(calc(var(--cw) / -2)) rotateY(0deg) translateZ(calc(var(--cw) / 2)); }
 .book .spine, .book .face { position: absolute; top: 0; height: var(--bh); display: block; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
-.book .spine { left: 0; width: var(--sw); }
-.book .face { left: var(--sw); width: var(--cw); transform-origin: left center; transform: rotateY(90deg); }
+.book .spine { left: 0; width: var(--sw); box-shadow: 6px 10px 8px var(--shadow); }
+.book .face { left: var(--sw); width: var(--cw); transform-origin: left center; transform: rotateY(90deg); box-shadow: 6px 10px 8px var(--shadow); }
 .book .spine::after, .book .face::after { content: ""; position: absolute; inset: 0; background: #10180f; pointer-events: none; }
 .book .spine::after { opacity: 0; }
 .book .face::after { opacity: .45; }
 .book:hover .model, .book:focus-visible .model {
-  transform: perspective(1600px) translateY(-16px) translateZ(calc((var(--cw) - var(--sw)) / 2)) rotateY(-90deg); }
+  transform: perspective(1600px) translateY(-16px) translateZ(calc(var(--sw) / -2)) rotateY(-90deg) translateZ(calc(var(--cw) / 2)); }
 .book:hover .spine::after, .book:focus-visible .spine::after { opacity: .45; }
 .book:hover .face::after, .book:focus-visible .face::after { opacity: 0; }
 .spine-title { position: absolute; left: 0; right: 0; top: calc(var(--cell) * 7.5); bottom: 96px; writing-mode: vertical-rl; display: flex; align-items: center; justify-content: center; font-family: var(--display); font-weight: 700; font-size: 20px; line-height: 1.05; text-align: center; padding: 0 8px; }
