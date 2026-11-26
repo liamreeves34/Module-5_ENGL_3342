@@ -2,7 +2,8 @@
 import Base from "../layouts/Base.astro";
 import Book from "../components/Book.astro";
 import { shelf, welcomeParas } from "../data/books";
-import { portrait, ledgeTile } from "../lib/pixel";
+import { ledgeTile } from "../lib/pixel";
+import { url } from "../lib/url";
 
 const HOME_H1 = "Four projects, one semester of technical writing";
 ---
@@ -25,8 +26,7 @@ const HOME_H1 = "Four projects, one semester of technical writing";
 
   <section class="welcome" aria-labelledby="hi">
     <figure class="portrait">
-      <Fragment set:html={portrait()} />
-      <figcaption>Placeholder: Liam’s photo or pixel avatar goes here.</figcaption>
+      <img src={url("images/liam-avatar.webp")} width="240" height="240" decoding="async" alt="Pixel-art portrait of Liam Reeves: long wavy brown hair, dark rectangular glasses, and a slight smile." />
     </figure>
     <div class="welcome-text">
       <h2 id="hi">Welcome to my library.</h2>

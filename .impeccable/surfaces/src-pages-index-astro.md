@@ -37,5 +37,5 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
 
 ## Unresolved
 
-- Liam's photo or pixel avatar (placeholder for now).
+- Resolved: Liam's generated pixel-art avatar (public/images/liam-avatar.webp), unaltered, 240px in an 8px ink frame.
 - Copy drafts await Liam's revision.

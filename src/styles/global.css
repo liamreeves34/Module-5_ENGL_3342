@@ -127,11 +127,14 @@ main:focus { outline: none; }
 .hint { padding: 14px 0 0; text-align: center; font-size: 16px; color: var(--ink-2); }
 
 /* ---------- home: welcome ---------- */
-.welcome { display: grid; grid-template-columns: 240px minmax(0, 74ch); gap: 56px; justify-content: center; padding: 72px 48px 96px; }
+.welcome { display: grid; grid-template-columns: 256px minmax(0, 74ch); gap: 56px; justify-content: center; padding: 72px 48px 96px; }
 .welcome h2 { font-family: var(--display); font-weight: 700; font-size: 40px; line-height: 1.05; letter-spacing: -0.015em; margin-bottom: 20px; }
 .welcome-text { background: var(--stock); border: 2px solid var(--ink); padding: 36px 44px 40px; box-shadow: 6px 10px 14px rgba(31,42,29,.16); }
 .welcome-text p + p { margin-top: 1em; }
-.portrait figcaption { font-size: 14px; color: var(--ink-2); margin-top: 10px; line-height: 1.4; }
+/* Liam's pixel-art avatar: his generated 1254 x 1254 image, published unaltered and shown at
+   240px in a one-cell ink frame (smooth downscaling keeps its pixel blocks even). */
+.portrait { margin: 0; }
+.portrait img { display: block; width: 240px; height: 240px; box-sizing: content-box; border: 8px solid var(--ink); background: #E1EAD3; }
 
 /* ---------- open book ---------- */
 .crumbs { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 22px 48px 0; }

@@ -187,15 +187,6 @@ export function bigCover(book: Cloth, Hc: number, faceH: number) {
   return svg(g, "px");
 }
 
-/** Placeholder portrait until Liam supplies a photo or pixel avatar. */
-export function portrait() {
-  const n = 30, g = grid(n, n);
-  rect(g, 0, 0, n, n, "#1F2A1D");
-  rect(g, 1, 1, n - 2, n - 2, "#E1EAD3");
-  stamp(g, ICONS.person, 7, 7, { o: "#1F2A1D", a: "#9DB585", b: "#9DB585", h: "#E1EAD3" });
-  return svg(g, "px portrait-art");
-}
-
 /** One 5-cell repeat of the shelf ledge, used as a repeating background. */
 export function ledgeTile() {
   const g = grid(5, 3);
