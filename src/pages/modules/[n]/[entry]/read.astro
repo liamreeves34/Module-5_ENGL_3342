@@ -2,7 +2,9 @@
 // Full-screen reading view for one document: description and facts on the left, a large PDF
 // viewer on the right, and an always-visible "Open PDF" link because many mobile browsers
 // (Android Chrome especially) do not render PDFs inline. The viewer falls back to the
-// first-page image when the browser cannot embed the PDF.
+// first-page image when the browser cannot embed the PDF. The viewer opens fitted to the page
+// width (view=FitH, read by the Chrome and Edge viewer; Firefox fits the page by default), so wide pages
+// such as the flyer are never cut off.
 import Base from "../../../../layouts/Base.astro";
 import { modules, artOf, type ModuleBook, type Doc } from "../../../../data/books";
 import { url } from "../../../../lib/url";
@@ -34,7 +36,7 @@ const pp = doc.pages === 1 ? "1 page" : `${doc.pages} pages`;
           <dl>{doc.facts.map(([k, v]) => <div><dt>{k}</dt><dd>{v}</dd></div>)}</dl>
         </div>
         <div class="viewer">
-          <object data={url(doc.pdf)} type="application/pdf" title={`${doc.title} (PDF, ${pp})`}>
+          <object data={`${url(doc.pdf)}#view=FitH`} type="application/pdf" title={`${doc.title} (PDF, ${pp})`}>
             <div class="fallback">
               <img src={url(doc.preview)} alt={`First page of ${doc.title}`} width="320" height="414" loading="lazy" />
               <p>This browser can’t show the PDF inside the page. <a href={url(doc.pdf)} target="_blank" rel="noopener">Open {doc.title} ({pp}, PDF)</a>.</p>

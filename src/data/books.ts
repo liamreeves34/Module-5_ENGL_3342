@@ -141,11 +141,12 @@ export const modules: ModuleBook[] = [
   },
   {
     kind: "module", id: "m4", n: 4, code: "Module 4", short: "AI Literacy & Job Materials",
-    title: "AI Literacy, Resume & Cover Letter",
-    runningHead: "Module 4 · AI literacy and job materials", where: "4 entries · Fall 2026",
+    title: "AI Literacy, Job Materials & Plain-Language Writing",
+    runningHead: "Module 4 · AI literacy, jobs, plain language", where: "5 entries · Fall 2026",
     cloth: "#7A2338", band: "#F2C14E", panel: "#F6E1E5", iconA: "#F2C14E", iconB: "#7A2338", text: "#FFFFFF", icon: "bulb", kick: "#7A2338",
     foot: ["Credits", "Workshop and flyer made with Tim Trasmonte."],
     reflection: paras(m4r),
+    spreadH: 84,
     docs: [
       doc("ai-flyer", {
         title: "AI Flyer: Think Before You Prompt", sub: "One page for classmates, with Tim Trasmonte", pages: 1,
@@ -170,6 +171,14 @@ export const modules: ModuleBook[] = [
         ],
         facts: [["Pages", "2"], ["Written", "Nov 14, 2026"]],
       }, "m4-resume-cover-letter"),
+      doc("plain-language-summary", {
+        title: "Plain-Language Summary", sub: "What heat really costs America’s freight trains", pages: 3,
+        summary: [
+          "My rail-heat research rewritten for readers outside the field. Heat-caused accidents are too rare to price, so the study prices the “slow orders” that prevent them: rules that slow trains in hot weather.",
+          "On each railroad’s own track, slow orders cost $65 to $244 million a year.",
+        ],
+        facts: [["Pages", "3"], ["Written", "Nov 22, 2026"], ["Summarizes", "Reeves et al., manuscript in preparation"]],
+      }, "m4-plain-language-summary"),
     ],
   },
 ];

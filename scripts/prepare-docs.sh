@@ -14,6 +14,7 @@ cp "$S/Module3/Module-3_Final_Report_Reeves_Saboia.pdf"                         
 cp "$S/Module3/Peer_Review_Feedback_Protocol_-_UTRGV_Parking.pdf"                  public/docs/m3-peer-review.pdf
 cp "$S/Module4/AI_Workshop/Module-4_AI-Flyer.pdf"                                  public/docs/m4-ai-flyer.pdf
 cp "$S/Module4/AI_Workshop/Module-4_Critical-AI-Literacy_Workshop.pdf"             public/docs/m4-ai-workshop.pdf
+cp "$S/Module4/Plain_Language_Summary/What_Heat_Really_Costs_America_-_Liam_Reeves.pdf" public/docs/m4-plain-language-summary.pdf
 python3 scripts/redact-resume.py "$S/Module4/Resume_and_Cover_Letter/Module-4_Resume_and_Cover_Letter_Liam_Reeves.pdf" public/docs/m4-resume-cover-letter.pdf
 for f in public/docs/*.pdf; do
   n=$(basename "$f" .pdf)
